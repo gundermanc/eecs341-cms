@@ -39,6 +39,16 @@ class UserExistsDatabaseException extends DatabaseException {
   }
 }
 
+/**
+ * User already exists exception type.
+ */
+class UsernameTooLongDatabaseException extends DatabaseException {
+
+  public function __construct($user, $max) {
+    parent::__construct("User '$user' is more than the max length of $max.");
+  }
+}
+
 
 
 
@@ -48,6 +58,7 @@ class UserExistsDatabaseException extends DatabaseException {
  * Database interaction class.
  */
 class Database {
+  const USER_MAX = 20;
 
   /**
    * Constructs a database interaction object and connects to the DB.
@@ -97,6 +108,10 @@ class Database {
     $user = $this->connection->escape_string($user);
     $date = date("Y-m-d H:i:s");
     $pass = hash(Config::HASH_ALGO, $pass);
+
+    if (strlen($user) > Database::USER_MAX) {
+      throw new UsernameTooLongDatabaseException($user, Database::USER_MAX);
+    }
 
     try {
       $this->query("INSERT INTO Users (user, pass, join_date)"
@@ -189,7 +204,6 @@ class Database {
 
     // Create admin user account.
     $this->insertUser(Config::ADMIN_USER, Config::ADMIN_PASS);
-
   }
 
   /**
