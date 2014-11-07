@@ -1,5 +1,6 @@
 <?php
-require_once 'database.php';
+$root=__DIR__."/..";
+require_once $root.'/inc/database.php';
 
 sesssion_start();
 
