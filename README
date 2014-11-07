@@ -1,0 +1,18 @@
+EECS 341 Databases Group Project
+
+Group Members:
+ - Karen Zoeller
+ - Elliot Essman
+ - Christian Gunderman
+
+Abstract:
+
+A web based collaborative document sharing and editing system, similar to
+Wikipedia. The idea is to create a note sharing webapp that allows for experts
+on a topic to create a page and accept contributions to it from students who
+have knowledge on the topic. Changes are queued and then added to the page when
+they are approved by the page owner. Ideally this will be implemented through
+diffing the changes and storing deltas, if time allows us to accomplish this.
+The webapp will implement a search feature, viewable user profile page,
+page ratings, comments, and more.
+
