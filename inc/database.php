@@ -183,6 +183,29 @@ class Database {
   }
 
   /**
+   * Inserts a new blank page with the given title and owner.
+   * Throws: DatabaseException if a SQL error occurs, or if insertPage
+   * is requested for user that doesn't exist.
+   * Returns: True if the page was created and false if not.
+   */
+  public function insertPage($title, $user) {
+    $title = $this->connection->escape_string($title);
+    $user = $this->connection->escape_string($user);
+
+    return $this->query("INSERT INTO Pages (title, user) VALUES ('$title', '$user')");
+  }
+
+  /**
+   * Deletes a page identified by its page id.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: True if page is deleted and false if page not exist.
+   */
+  public function deletePage($id) {
+    $this->query("DELETE FROM Pages WHERE id=$id");
+    return ($this->connection->affected_rows > 0);
+  }
+
+  /**
    * Drops the old database and creates the table schemas from scratch.
    */
   private function freshInstall() {
@@ -204,6 +227,15 @@ class Database {
 
     // Create admin user account.
     $this->insertUser(Config::ADMIN_USER, Config::ADMIN_PASS);
+
+    // Create the pages table.
+    $this->query("CREATE TABLE Pages ("
+                 . "id MEDIUMINT AUTO_INCREMENT, "
+                 . "title VARCHAR(255) NOT NULL, "
+                 . "user VARCHAR(25), "
+                 . "PRIMARY KEY (id), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user)"
+                 . ")");
   }
 
   /**
