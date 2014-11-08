@@ -394,7 +394,7 @@ class Database {
 
     if ($rating != null) {
       if ($rating < 0 || $rating > Database::RATING_MAX) {
-        throw new InvalidRatingDatabaseException(Database::RATING_MAX);
+        throw new InvalidRatingDatabaseException($rating);
       }
 
       $columns .= ", rating";
