@@ -59,6 +59,16 @@ class TitleTooLongDatabaseException extends DatabaseException {
   }
 }
 
+/**
+ * Diff too long exception.
+ */
+class DiffTooLongDatabaseException extends DatabaseException {
+
+  public function __construct($max) {
+    parent::__construct("Diff is more than the max length of $max.");
+  }
+}
+
 
 
 
@@ -70,6 +80,7 @@ class TitleTooLongDatabaseException extends DatabaseException {
 class Database {
   const USER_MAX = 20;
   const TITLE_MAX = 250;
+  const DIFF_MAX = 990;
 
   /**
    * Constructs a database interaction object and connects to the DB.
@@ -281,6 +292,10 @@ class Database {
     $contribDiff = $this->connection->escape_string($contribDiff);
     $date = Database::timeStamp();
     $parentId = $parentId == null ? "NULL" : $parentId;
+
+    if (strlen($contribDiff) > Database::MAX_DIFF) {
+      throw new DiffTooLongException(Database::MAX_DIFF);
+    }
 
     if ($approved == null) {
       $approved = "NULL";
