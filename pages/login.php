@@ -17,7 +17,7 @@ if(isset($_POST['uname'])){
   $db = new Database();
   if($db->authenticateUser($uname,$pass)){
     //success
-    $_SESSION['userName'] = $uname;
+    logIn($uname);
     redirectToIndex();
   } else{
     $message="Could not log you in."

@@ -12,8 +12,16 @@ public function redirectIfLoggedIn(){
   }
 }
 
+public function logIn($uname){
+  if(session_status() !== PHP_SESSION_ACTIVE){
+    throw new AppException("Cannot log in without an active session.");
+  }
+  $_SESSION['userName'] = $uname;
+}
+
 /**
- * Make sure a session has been started before calling
+ * Make sure a session has been started before calling.
+ * A closed session could mean they logged out, or you forgot to open one
  */
 public function isLoggedIn(){
   if(session_status() === PHP_SESSION_ACTIVE){
