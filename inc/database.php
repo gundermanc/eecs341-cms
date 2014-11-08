@@ -443,7 +443,7 @@ class Database {
   private function freshInstall() {
 
     // Drop the old database *sniffle* goodbye!
-    $this->query("DROP DATABASE " . Config::SQL_DB);
+    $this->query("DROP DATABASE IF EXISTS " . Config::SQL_DB);
 
     // Create the parent database.
     $this->query("CREATE DATABASE " . Config::SQL_DB);
