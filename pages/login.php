@@ -1,17 +1,13 @@
 <?php
-$root=__DIR__."/..";
-require_once $root.'/inc/database.php';
+require_once '../inc/database.php';
+require_once '../inc/util.php';
 
 sesssion_start();
+redirectIfLoggedIn();
 
 $message="";
 $uname=""
 $pass=""
-
-//redirect if logged in
-if(isset($_SESSION['userName'])){
-    header("Location: index.php");
-}
 
 //when a post is recieved
 if(isset($_POST['uname'])){
@@ -22,7 +18,7 @@ if(isset($_POST['uname'])){
   if($db->authenticateUser($uname,$pass)){
     //success
     $_SESSION['userName'] = $uname;
-    header("Location: index.php");
+    redirectToIndex();
   } else{
     $message="Could not log you in."
   }
