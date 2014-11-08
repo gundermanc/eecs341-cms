@@ -106,7 +106,7 @@ class Database {
    */
   public function insertUser($user, $pass) {
     $user = $this->connection->escape_string($user);
-    $date = date("Y-m-d H:i:s");
+    $date = Database::timeStamp();
     $pass = hash(Config::HASH_ALGO, $pass);
 
     if (strlen($user) > Database::USER_MAX) {
@@ -191,8 +191,10 @@ class Database {
   public function insertPage($title, $user) {
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
+    $date = Database::timeStamp();
 
-    return $this->query("INSERT INTO Pages (title, user) VALUES ('$title', '$user')");
+    return $this->query("INSERT INTO Pages (title, user, created_date) "
+                        . "VALUES ('$title', '$user', '$date')");
   }
 
   /**
@@ -203,6 +205,53 @@ class Database {
   public function deletePage($id) {
     $this->query("DELETE FROM Pages WHERE id=$id");
     return ($this->connection->affected_rows > 0);
+  }
+
+  /**
+   * Queries a page by it's ID.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The specified page as an array (id, title, user, created_date),
+   * or null if the page doesn't exist.
+   */
+  public function queryPageById($pageId) {
+    $result = $this->query("SELECT * FROM Pages WHERE id=$pageId");
+
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+      return null;
+    }
+
+    return $result->fetch_row();
+  }
+
+  /**
+   * Finds all pages with the specified title, or title pattern. e.g.: 
+   * $title="Hi%Charlie" matches any string that begins with Hi and ends
+   * with Charlie. Uses SQL 'LIKE' patterns.
+   * Username must match given username. Name can be null for any user.
+   * '%' means match unlimited any chars.
+   * '_' means match one any char.
+   * Throws: DatabaseException if SQL errors occur.
+   * Returns: An array of "Page" arrays. Page array is of format
+   * (id, title, user, created_date). Returns empty array on no matches.
+   */
+  public function queryPages($title = null, $user = null) {
+
+    if ($title == null) {
+      $title = "%";
+    }
+
+    if ($user == null) {
+      $user = "%";
+    }
+
+    $title = $this->connection->escape_string($title);
+    $user = $this->connection->escape_string($title);
+    $queryStr = "SELECT * FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
+
+    $result = $this->query($queryStr);
+
+    return $result->fetch_all();
   }
 
   /**
@@ -220,8 +269,8 @@ class Database {
     // Create users table.
     $this->query("CREATE TABLE Users ("
                      . "user VARCHAR(25), "
-                     . "pass VARCHAR(64), "
-                     . "join_date DATETIME, "
+                     . "pass VARCHAR(64) NOT NULL, "
+                     . "join_date DATETIME NOT NULL, "
                      . "PRIMARY KEY(user) "
                      . ")");
 
@@ -233,6 +282,7 @@ class Database {
                  . "id MEDIUMINT AUTO_INCREMENT, "
                  . "title VARCHAR(255) NOT NULL, "
                  . "user VARCHAR(25), "
+                 . "created_date DATETIME NOT NULL, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user)"
                  . ")");
@@ -253,6 +303,13 @@ class Database {
     }
 
     return $result;
+  }
+
+  /**
+   * Gets the current date and time in a SQL ready format.
+   */
+  private static function timeStamp() {
+    return date("Y-m-d H:i:s");
   }
 }
 
