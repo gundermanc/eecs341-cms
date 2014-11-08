@@ -261,12 +261,79 @@ class Database {
     }
 
     $title = $this->connection->escape_string($title);
-    $user = $this->connection->escape_string($title);
+    $user = $this->connection->escape_string($user);
     $queryStr = "SELECT * FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
 
     $result = $this->query($queryStr);
 
     return $result->fetch_all();
+  }
+
+  /**
+   * Inserts a new change record into the database. Note: actual diffing
+   * happens elsewhere. This function just handles the SQL.
+   * Throws: DatabaseException if there is a SQL error.
+   * Returns: Nothing.
+   */
+  public function insertChange($user, $pageId, $parentId,  
+                               $contribDiff, $approved = null) {
+    $user = $this->connection->escape_string($user);
+    $contribDiff = $this->connection->escape_string($contribDiff);
+    $date = Database::timeStamp();
+    $parentId = $parentId == null ? "NULL" : $parentId;
+
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    $this->query("INSERT INTO Changes (approved, contrib_diff, "
+                 . "change_date, user, page_id, parent_id) "
+                 . "VALUES ($approved, '$contribDiff', '$date', "
+                 . "'$user', $pageId, $parentId)");
+  }
+
+  /**
+   * Deletes a change by its changeId number.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: true, or false if an error occurs. NOTE: this function
+   * will still return true if no change with the specified id exists.
+   */
+  public function deleteChange($changeId) {
+    return $this->query("DELETE FROM Changes WHERE id=$changeId");
+  }
+
+  /**
+   * Get changes for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: an array of "Changes" arrays of form
+   * (id, approved, contrib_diff, change_date, user, page_id, parent_id)
+   */
+  public function queryChangesByPage($pageId) {
+    $result = $this->query("SELECT * FROM Changes WHERE page_id='$pageId'");
+
+    return $result->fetch_all();
+  }
+
+  /**
+   * Approves or denies a change entry.
+   * Throws: DatabaseException if there is a SQL error.
+   * Returns: True if everything is ok, and false if there was
+   * an error.
+   */
+  public function updateChangeApproved($changeId, $approved) {
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    return $this->query("UPDATE Changes SET approved=$approved WHERE id=$changeId");
   }
 
   /**
@@ -300,6 +367,21 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user)"
+                 . ")");
+
+    // Create the changes table.
+    $this->query("CREATE TABLE Changes ("
+                 . "id MEDIUMINT AUTO_INCREMENT, "
+                 . "approved BOOLEAN, "
+                 . "contrib_diff VARCHAR(1000) NOT NULL, "
+                 . "change_date DATETIME NOT NULL, "
+                 . "user VARCHAR(25) NOT NULL, "
+                 . "page_id MEDIUMINT NOT NULL, "
+                 . "parent_id MEDIUMINT, "
+                 . "PRIMARY KEY (id), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user), "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id), "
+                 . "FOREIGN KEY (parent_id) REFERENCES Changes(id)"
                  . ")");
   }
 
