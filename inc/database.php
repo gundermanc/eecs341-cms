@@ -40,12 +40,22 @@ class UserExistsDatabaseException extends DatabaseException {
 }
 
 /**
- * User already exists exception type.
+ * Username too long exception.
  */
 class UsernameTooLongDatabaseException extends DatabaseException {
 
   public function __construct($user, $max) {
     parent::__construct("User '$user' is more than the max length of $max.");
+  }
+}
+
+/**
+ * Title too long exception.
+ */
+class TitleTooLongDatabaseException extends DatabaseException {
+
+  public function __construct($title, $max) {
+    parent::__construct("Title '$title' is more than the max length of $max.");
   }
 }
 
@@ -59,6 +69,7 @@ class UsernameTooLongDatabaseException extends DatabaseException {
  */
 class Database {
   const USER_MAX = 20;
+  const TITLE_MAX = 250;
 
   /**
    * Constructs a database interaction object and connects to the DB.
@@ -192,6 +203,10 @@ class Database {
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
     $date = Database::timeStamp();
+
+    if (strlen($title) > Database::TITLE_MAX) {
+      throw new TitleTooLongException($title, $max);
+    }
 
     return $this->query("INSERT INTO Pages (title, user, created_date) "
                         . "VALUES ('$title', '$user', '$date')");
