@@ -69,10 +69,36 @@ class DiffTooLongDatabaseException extends DatabaseException {
   }
 }
 
+/**
+ * Comment too long exception.
+ */
+class CommentTooLongDatabaseException extends DatabaseException {
 
+  public function __construct($max) {
+    parent::__construct("Comment is more than the max length of $max.");
+  }
+}
 
+/**
+ * Invalid rating exception.
+ */
+class InvalidRatingDatabaseException extends DatabaseException {
 
+  public function __construct($rating) {
+    parent::__construct("Rating must be between 0 and 5. Got $rating.");
+  }
+}
 
+/**
+ * Replace view database exception.
+ */
+class ReplaceViewDatabaseException extends DatabaseException {
+
+  public function __construct($user, $pageId) {
+    parent::__construct("Unable to update View record. Invalid username '$user'"
+                        . "or page id '$pageId'.");
+  }
+}
 
 /**
  * Database interaction class.
@@ -81,6 +107,8 @@ class Database {
   const USER_MAX = 20;
   const TITLE_MAX = 250;
   const DIFF_MAX = 990;
+  const RATING_MAX = 5;
+  const COMMENT_MAX = 250;
 
   /**
    * Constructs a database interaction object and connects to the DB.
@@ -127,13 +155,13 @@ class Database {
    * Returns: Nothing.
    */
   public function insertUser($user, $pass) {
-    $user = $this->connection->escape_string($user);
-    $date = Database::timeStamp();
-    $pass = hash(Config::HASH_ALGO, $pass);
-
     if (strlen($user) > Database::USER_MAX) {
       throw new UsernameTooLongDatabaseException($user, Database::USER_MAX);
     }
+
+    $user = $this->connection->escape_string($user);
+    $date = Database::timeStamp();
+    $pass = hash(Config::HASH_ALGO, $pass);
 
     try {
       $this->query("INSERT INTO Users (user, pass, join_date)"
@@ -211,13 +239,14 @@ class Database {
    * Returns: True if the page was created and false if not.
    */
   public function insertPage($title, $user) {
-    $title = $this->connection->escape_string($title);
-    $user = $this->connection->escape_string($user);
-    $date = Database::timeStamp();
 
     if (strlen($title) > Database::TITLE_MAX) {
       throw new TitleTooLongException($title, $max);
     }
+
+    $title = $this->connection->escape_string($title);
+    $user = $this->connection->escape_string($user);
+    $date = Database::timeStamp();
 
     return $this->query("INSERT INTO Pages (title, user, created_date) "
                         . "VALUES ('$title', '$user', '$date')");
@@ -352,6 +381,63 @@ class Database {
   }
 
   /**
+   * Creates or updates a view record with the new comment and or rating.
+   * Either comment or rating may be null if you don't want to change it.
+   * Throws: DatabaseException if a SQL error occurs, or if an invalid
+   * user or pageId is given.
+   * Returns: Nothing.
+   */
+  public function replaceView($user, $pageId, $rating, $comment) {
+
+    $columns = "";
+    $values = "";
+
+    if ($rating != null) {
+      if ($rating < 0 || $rating > Database::RATING_MAX) {
+        throw new InvalidRatingDatabaseException(Database::RATING_MAX);
+      }
+
+      $columns .= ", rating";
+      $values .= ", $rating";
+    }
+
+    if ($comment != null) {
+      if (strlen($comment) > Database::COMMENT_MAX) {
+        throw new CommentTooLongDatabaseException(Database::MAX_COMMENT);
+      }
+
+      $comment = $this->connection->escape_string($comment);
+      $columns .= ", comment";
+      $values .= ", '$comment'";
+    }
+
+    try {
+      $this->query("REPLACE INTO Views (user, page_id $columns) "
+                   . "VALUES ('$user', $pageId$values)");
+    } catch (DatabaseException $ex) {
+
+      // FOREIGN KEY Constraint: Incorrect username or page.
+      if ($ex->getSqlCode() == 1452) {
+        throw new ReplaceViewDatabaseException($user, $pageId);
+      } else {
+        throw $ex;
+      }
+    }
+  }
+
+  /**
+   * Queries DB for all views of the requested page.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: an array of "View" arrays. View array is formed as:
+   * (user, page_id, rating, comment).
+   */
+  public function queryViews($pageId) {
+    $result = $this->query("SELECT * FROM Views WHERE page_id=$pageId");
+
+    return $result->fetch_all();
+  }
+
+  /**
    * Drops the old database and creates the table schemas from scratch.
    */
   private function freshInstall() {
@@ -398,6 +484,17 @@ class Database {
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id), "
                  . "FOREIGN KEY (parent_id) REFERENCES Changes(id)"
                  . ")");
+
+    // Create the views table.
+    $this->query("CREATE TABLE Views ("
+                 . "user VARCHAR(25), "
+                 . "page_id MEDIUMINT, "
+                 . "rating TINYINT NOT NULL, "
+                 . "comment VARCHAR(255), "
+                 . "PRIMARY KEY (user, page_id), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user), "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 .")");
   }
 
   /**
