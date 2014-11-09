@@ -247,7 +247,7 @@ class Database {
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
     $date = Database::timeStamp();
-
+      
     return $this->query("INSERT INTO Pages (title, user, created_date) "
                         . "VALUES ('$title', '$user', '$date')");
   }
@@ -307,6 +307,52 @@ class Database {
     $result = $this->query($queryStr);
 
     return $result->fetch_all();
+  }
+  
+  /**
+   * Inserts a new keyword associated with a page
+   */
+  public function insertKeyword($page_id, $word) {
+    $page_id = $this->connection->escape_string($page_id);
+    $word = $this->connection->escape_string($word);
+      
+    $this->query("INSERT INTO Keywords (page_id, word)"
+                   . " VALUES ('$page_id', '$word')");
+  }
+   
+    
+    
+  public function queryKeywordsByPageId($pageId) {
+    $result = $this->query("SELECT * FROM Keywords WHERE page_id=$pageId");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_row();
+  }
+    
+    
+    
+  public function queryKeywordsByWord($word) {
+    $result = $this->query("SELECT * FROM Keywords WHERE word=$word");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_row();
+  }
+    
+  /**
+   * Deletes a keyword that is associated with a page.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: true, or false if an error occurs.
+   */
+  public function deleteKeyword($page_id, $word) {
+    return $this->query("DELETE FROM Keywords WHERE page_id=$page_id AND word=$word");
   }
 
   /**
@@ -483,6 +529,14 @@ class Database {
                  . "FOREIGN KEY (user) REFERENCES Users(user), "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id), "
                  . "FOREIGN KEY (parent_id) REFERENCES Changes(id)"
+                 . ")");
+      
+    // Create the keywords table.
+    $this->query("CREATE TABLE Keywords ("
+                 . "page_id MEDIUMINT, "
+                 . "word VARCHAR(25), "
+                 . "PRIMARY KEY (page_id, word), "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
                  . ")");
 
     // Create the views table.
