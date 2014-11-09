@@ -32,10 +32,21 @@ class Application {
     if($this->database->authenticateUser($uname,$pass)){
       logIn($uname);
       redirectToIndex();
-      return true;
     } else{
       return false;
     }
+  }
+
+  /**
+   * Adds user to the database, logs them in, and redirects them to the homepage.
+   */
+  public static function registerUser($uname, $pass){
+    if($this->database->userExists($uname)){
+      throw new AppException("That name is taken.");
+    }
+    $this->database->insertUser($uname, $pass1);
+    logIn($user);
+    redirectToIndex();
   }
 }
 ?>
