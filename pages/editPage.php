@@ -13,12 +13,12 @@ $text="";
 if(isset($_POST['title'])){
   $title=$_POST['title'];
   $text=$_POST['text'];
-  Application->savePage();//TODO
+  Application->savePage($title, $text);
 }
 
 if(isset($_GET['title'])){
   $title=$_POST['title'];
-  Application->loadPage();//TODO
+  list($title, $text) = Application->loadPage();
 }
 
 ?>
