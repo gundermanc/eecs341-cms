@@ -1,5 +1,5 @@
 <?php
-require_once '../inc/database.php';
+require_once '../inc/application.php'
 require_once '../inc/util.php';
 
 sesssion_start();

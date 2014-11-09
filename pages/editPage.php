@@ -6,15 +6,21 @@ require_once '../inc/application.php'
 sesssion_start();
 redirectIfNotLoggedIn();
 
-$text="";
+$message = "";
 $title="";
-$message="";
+$text="";
 
 if(isset($_POST['title'])){
-  $title = $_POST['title'];
-  $text = $_POST['text'];
-  //call application func: save new page
+  $title=$_POST['title'];
+  $text=$_POST['text'];
+  //call application func: save page
 }
+
+if(isset($_GET['title'])){
+  $title=$_POST['title'];
+  //call app. func: load page
+}
+
 ?>
 <html>
   <body>
@@ -22,9 +28,9 @@ if(isset($_POST['title'])){
   echo getLoginInfo();
   echo getThingsToDo();
 ?>
-  <form action="writePage.php" method="post">
+  <form action="editPage.php" method="post">
     <input name="title" type="text"><?php echo $title ?></input>
-    <input name="text" type='textArea'><?php echo $text ?></input>
+    <input name="text" type='textArea' id='input'><?php echo $text ?></input>
     <input type=submit></input>
   </form>
   <?php echo $message ?>
