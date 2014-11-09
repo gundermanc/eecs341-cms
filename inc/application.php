@@ -68,8 +68,8 @@ class Application {
   /**
    * Returns an array of page arrays, of the form (id, title, user, created_date).
    */
-  public static function getSearchResults($search){
-   return $this->database->queryPages($search,null);//null for no user search
+  public static function getSearchResults($title, $author){
+   return $this->database->queryPages($search,$author);
   }
 }
 ?>
