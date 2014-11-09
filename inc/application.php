@@ -48,5 +48,12 @@ class Application {
     logIn($user);
     redirectToIndex();
   }
+
+  /**
+   * Saves a new page in the database
+   */
+  public static function newPage($name){
+    return loggedIn() && $this->database->insertPage($name,getuserName());
+  }
 }
 ?>
