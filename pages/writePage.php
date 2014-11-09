@@ -6,14 +6,16 @@ require_once '../inc/application.php'
 sesssion_start();
 redirectIfNotLoggedIn();
 
-$text="";
 $title="";
 $message="";
 
 if(isset($_POST['title'])){
   $title = $_POST['title'];
-  $text = $_POST['text'];
-  //call application func: save new page
+  try{
+    Application->newPage($title);
+  } catch(Exception $e){
+    $message = $e->getMessage();
+  }
 }
 ?>
 <html>
@@ -24,7 +26,6 @@ if(isset($_POST['title'])){
 ?>
   <form action="writePage.php" method="post">
     <input name="title" type="text"><?php echo $title ?></input>
-    <input name="text" type='textArea'><?php echo $text ?></input>
     <input type=submit></input>
   </form>
   <?php echo $message ?>

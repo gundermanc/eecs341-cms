@@ -13,10 +13,11 @@ $pass=""
 if(isset($_POST['uname'])){
   $uname=$_POST['uname'];
   $pass=$_POST['pass'];
-  if(Application->logIn()){
+  try{
+    Application->logIn();
     redirectToIndex();
-  } else{
-    $message="Could not log you in.";
+  } catch(Exception $e){
+    $message=$e->getMessage();
   }
 }
 ?>

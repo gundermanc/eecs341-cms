@@ -19,13 +19,11 @@ if(isset($_POST['uname'])){
     $message = "Your passwords don't match";
     return;
   }
-  $db = new Database();
-  if($db->userExists($uname)){
-    $message = "That name is taken.";
+  try{
+    Application->registerUser($uname, $pass);
+  } catch(Exception $e){
+    $message = $e->getMessage();
   }
-  $message = "Success!";
-  $db->insertUser($uname, $pass1);
-  logIn($uname);
 }
 ?>
 <html>

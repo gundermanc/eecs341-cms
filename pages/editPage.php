@@ -13,12 +13,12 @@ $text="";
 if(isset($_POST['title'])){
   $title=$_POST['title'];
   $text=$_POST['text'];
-  //call application func: save page
+  Application->savePage();//TODO
 }
 
 if(isset($_GET['title'])){
   $title=$_POST['title'];
-  //call app. func: load page
+  Application->loadPage();//TODO
 }
 
 ?>
