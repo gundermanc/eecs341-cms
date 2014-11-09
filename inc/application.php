@@ -56,7 +56,7 @@ class Application {
     return loggedIn() && $this->database->insertPage($name,getuserName());
   }
 
-  public static function savePage($title, $text){
+  public static function savePage($pid, $title, $text){
    //TODO 
   }
 
