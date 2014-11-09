@@ -13,14 +13,10 @@ $pass=""
 if(isset($_POST['uname'])){
   $uname=$_POST['uname'];
   $pass=$_POST['pass'];
-  //authenticate
-  $db = new Database();
-  if($db->authenticateUser($uname,$pass)){
-    //success
-    logIn($uname);
+  if(Application->logIn()){
     redirectToIndex();
   } else{
-    $message="Could not log you in."
+    $message="Could not log you in.";
   }
 }
 ?>
