@@ -64,5 +64,12 @@ class Application {
     //TODO
     //return array($title, $text);
   }
+
+  /**
+   * Returns an array of page arrays, of the form (id, title, user, created_date).
+   */
+  public static function getSearchResults($search){
+   return $this->database->queryPages($search,null);//null for no user search
+  }
 }
 ?>
