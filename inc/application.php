@@ -55,5 +55,14 @@ class Application {
   public static function newPage($name){
     return loggedIn() && $this->database->insertPage($name,getuserName());
   }
+
+  public static function savePage($title, $text){
+   //TODO 
+  }
+
+  public static function loadPage($pid){
+    //TODO
+    //return array($title, $text);
+  }
 }
 ?>
