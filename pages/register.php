@@ -1,8 +1,8 @@
 <?php
-require_once '../inc/application.php'
+require_once '../inc/application.php';
 require_once '../inc/util.php';
 
-sesssion_start();
+session_start();
 redirectIfLoggedIn();
 
 $message="";
@@ -20,7 +20,8 @@ if(isset($_POST['uname'])){
     return;
   }
   try{
-    Application->registerUser($uname, $pass);
+    $A = new Application();
+    $A->registerUser($uname, $pass1);
   } catch(Exception $e){
     $message = $e->getMessage();
   }
@@ -29,9 +30,9 @@ if(isset($_POST['uname'])){
 <html>
   <body>
     <form action="register.php" method="post">
-      Username: <input type=text name=uname maxlength=20><?php echo $uname ?></input>
-      Password: <input type=password name=pass maxlength=20><?php echo $pass1 ?></input>
-      Password again: <input type=password name=pass maxlength=20><?php echo $pass2 ?></input>
+      Username: <input type=text name=uname maxlength=20 value="<?php echo $uname ?>"></input></br>
+      Password: <input type=password name=pass1 maxlength=20 value="<?php echo $pass1 ?>"></input></br>
+      Password again: <input type=password name=pass2 maxlength=20 value="<?php echo $pass2 ?>"></input>
       <input type=submit></input>
     </form>
 Register an account</br><?php echo $message ?>

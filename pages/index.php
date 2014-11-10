@@ -1,13 +1,13 @@
 <?php
 require_once '../inc/util.php';
-require_once '../inc/styleEngine.php'
+require_once '../inc/style_engine.php';
 
-sesssion_start();
+session_start();
 
 ?>
 <html>
   <body>
-<?php 
+<?php
   echo getLoginInfo();
   echo getThingsToDo();
 ?>

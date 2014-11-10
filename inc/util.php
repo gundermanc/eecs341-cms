@@ -1,18 +1,18 @@
 <?php
 
-public function redirectIfNotLoggedIn(){
+function redirectIfNotLoggedIn(){
   if(!isLoggedIn()){
-    _redirectToLogin();
+    redirectToLogin();
   }
 }
 
-public function redirectIfLoggedIn(){
+function redirectIfLoggedIn(){
   if(isLoggedIn()){
-    _redirectToIndex();
+    redirectToIndex();
   }
 }
 
-public function logIn($uname){
+function setLoginTrue($uname){
   if(session_status() !== PHP_SESSION_ACTIVE){
     throw new AppException("Cannot log in without an active session.");
   }
@@ -23,31 +23,35 @@ public function logIn($uname){
  * Make sure a session has been started before calling.
  * A closed session could mean they logged out, or you forgot to open one
  */
-public function isLoggedIn(){
+function isLoggedIn(){
   if(session_status() === PHP_SESSION_ACTIVE){
     return isset($_SESSION['userName']);
   }
   return false;
 }
 
-public function getUserName(){
+function getUserName(){
   if(!isLoggedIn()){
     throw new AppException("Attempted to get user name while not logged in.");
   }
   return $_SESSION['userName'];
 }
 
-public function logout(){
+function logout(){
   session_start();
   session_unset();
   session_destroy();
 }
 
-public function redirectToLogin(){
+function redirectToLogin(){
   header("Location: login.php");
 }
 
-public function redirectToIndex(){
+function redirectToIndex(){
   header("Location: index.php");
+}
+
+function redirectToEdit($pid){
+  header("Location: edit_page.php?pid=$pid");
 }
 ?>
