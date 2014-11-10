@@ -336,14 +336,14 @@ class Database {
     
     
   public function queryKeywordsByWord($word) {
-    $result = $this->query("SELECT * FROM Keywords WHERE word=$word");
+    $result = $this->query("SELECT * FROM Keywords WHERE word='$word'");
         
     // No pages with the specified id, return null.
     if ($result->num_rows == 0) {
         return null;
     }
         
-    return $result->fetch_row();
+    return $result;
   }
     
   /**
