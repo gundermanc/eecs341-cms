@@ -1,9 +1,9 @@
 <?php
 require_once '../inc/util.php';
-require_once '../inc/styleEngine.php';
+require_once '../inc/style_engine.php';
 require_once '../inc/application.php';
 
-sesssion_start();
+session_start();
 redirectIfNotLoggedIn();
 
 $message = "";
@@ -16,16 +16,18 @@ if(isset($_POST['pid'])){
   $text=$_POST['text'];
   $pid= $_POST['pid'];
   try{
-    Application->savePage($pid, $title, $text);
+    $A=new Application();
+    $A->savePage($pid, $title, $text);
   } catch(Exception $e){
     $message=$e->getMessage();
   }
 }
 
-if(isset($_GET['pid'])){
+else if(isset($_GET['pid'])){
   $pid=$_GET['pid'];
   try{
-    list($title, $text) = Application->loadPage($pid);
+    $A=new Application();
+    list($title, $text) = $A->loadPage($pid);
   } catch(Exception $e){
     $message=$e->getMessage();
   }
@@ -38,9 +40,9 @@ if(isset($_GET['pid'])){
   echo getLoginInfo();
   echo getThingsToDo();
 ?>
-  <form action="editPage.php" method="post">
-    <input name="title" type="text"><?php echo $title ?></input>
-    <input name="text" type='textArea' id='input'><?php echo $text ?></input>
+  <form action="edit_page.php" method="post">
+    Title:<input name="title" type="text" value="<?php echo $title ?>"></input></br>
+    Text:<input name="text" type='textArea' id='input' value="<?php echo $text ?>"></input></br>
     <input name="pid" type="hidden" value="<?php echo $pid ?>">
     <input type=submit></input>
   </form>
