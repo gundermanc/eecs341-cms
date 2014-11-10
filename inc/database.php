@@ -151,19 +151,16 @@ class Database {
     $user = $this->connection->escape_string($user);
 
     $result = $this->query("SELECT pass FROM Users U WHERE U.user='$user'");
-
     // Invalid username.
     if ($result->num_rows == 0) {
       return false;
     }
-
+    
     $passHash = $result->fetch_row()[0];
-
     // Invalid password.
     if (hash(Config::HASH_ALGO, $pass) != $passHash) {
       return false;
     }
-
     // User authentication successful.
     return true;
   }
@@ -192,7 +189,8 @@ class Database {
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
 
-    return $this->query("INSERT INTO Pages (title, user) VALUES ('$title', '$user')");
+    $this->query("INSERT INTO Pages (title, user) VALUES ('$title', '$user')");
+    return mysqli_insert_id($this->connection);
   }
 
   /**
@@ -211,7 +209,7 @@ class Database {
   private function freshInstall() {
 
     // Drop the old database *sniffle* goodbye!
-    $this->query("DROP DATABASE " . Config::SQL_DB);
+    $this->query("DROP DATABASE IF EXISTS " . Config::SQL_DB);
 
     // Create the parent database.
     $this->query("CREATE DATABASE " . Config::SQL_DB);

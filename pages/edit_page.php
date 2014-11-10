@@ -1,7 +1,7 @@
 <?php
 require_once '../inc/util.php';
-require_once '../inc/styleEngine.php'
-require_once '../inc/application.php'
+require_once '../inc/styleEngine.php';
+require_once '../inc/application.php';
 
 sesssion_start();
 redirectIfNotLoggedIn();
@@ -23,9 +23,9 @@ if(isset($_POST['pid'])){
 }
 
 if(isset($_GET['pid'])){
-  $title=$_GET['pid'];
+  $pid=$_GET['pid'];
   try{
-    list($title, $text) = Application->loadPage();
+    list($title, $text) = Application->loadPage($pid);
   } catch(Exception $e){
     $message=$e->getMessage();
   }
