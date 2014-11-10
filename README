@@ -5,6 +5,13 @@ Group Members:
  - Elliot Essman
  - Christian Gunderman
 
+Third Party Credit:
+ - Uses diff_match_patch_php library:
+     Ported to PHP 2010 by Tobias Buschor <shwups.ch>.
+     https://github.com/nuxodin/diff_match_patch-php
+
+     Diff, Match and Patch Library By: Neil Fraser. Copyright 2006 Google Inc.
+
 Abstract:
 
 A web based collaborative document sharing and editing system, similar to
