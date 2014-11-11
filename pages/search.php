@@ -14,11 +14,13 @@ $pages=null;
 if(isset($_GET['title'])){
   $title = $_GET['title'];
   $author = $_GET['author'];
+  $keywords= $_GET['keywords'];
   try{
     $A =new Application();
     $pages = $A->getSearchResults(
 	$title==""? null : $title,
-	$author==""? null : $author);
+	$author==""? null : $author
+	$keywords==""? null : $keywords);
   } catch(Exception $e){
     $message = $e->getException();
   }
@@ -36,6 +38,10 @@ if(isset($_GET['title'])){
       #adv{
 	display: none;
       }
+      #toggle{
+	text-decoration: underline;
+	cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -44,11 +50,12 @@ if(isset($_GET['title'])){
   echo getThingsToDo();
 ?>
   <form action="search.php" method="get">
-      Search by title: <input type=text name=title maxlength=20><?php echo $title ?></input>
+      Search by title: <input type=text name=title maxlength=20 value="<?php echo $title ?>"></input>
       <!-- advanced search -->
-      <span onclick=openAdv()>Advanced Search</span>
+      <span id="toggle" onclick=openAdv()>Advanced Search</span>
       <span id="adv">
-	Search by author: <input type=text name=author maxlength=20><?php echo $author ?></input></br>
+	Search by author: <input type=text name=author maxlength=20 value="<?php echo $author ?>"></input></br>
+	Search by keywords(separated by commas): <input type=text name=keywords maxlength=20 value="<?php echo keywords ?>"></input></br>
 	% is unlimited chars</br>
 	_ is any one char
       </span>
