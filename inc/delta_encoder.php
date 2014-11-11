@@ -17,7 +17,7 @@ class DeltaEncoder {
    * serialized into a string in GNU style.
    */
   public static function encodeDelta($oldText, $newText) {
-    $dmp = new diff_match_patch();
+    $dmp = self::dmp();
 
     return $dmp->patch_toText($dmp->patch_make($oldText, $newText));
   }
@@ -28,7 +28,7 @@ class DeltaEncoder {
    * applied.
    */
   public static function applyDelta($oldText, $delta) {
-    $dmp = new diff_match_patch();
+    $dmp = self::dmp();
 
     $patchOpResult = $dmp->patch_apply($dmp->patch_fromText($delta), $oldText);
 
@@ -44,16 +44,23 @@ class DeltaEncoder {
    * Returns: a string containing the output string.
    */
   public static function assembleDeltas($deltaArray) {
-    $prevDelta = "";
     $result = "";
 
     // Apply each of the deltas one-by-one.
-    foreach ($deltaArray as $delta) {
-      $result = self::applyDelta($result, $delta);
-      echo $delta;
+    for ($i = 0; $i < count($deltaArray); $i++) {
+      $result = self::applyDelta($result, $deltaArray[$i]);
     }
 
     return $result;
+  }
+
+  /**
+   * Get standard instance of diff, match patch.
+   */
+  private static function dmp() {
+    $dmp = new diff_match_patch();
+
+    return $dmp;
   }
 
 }
