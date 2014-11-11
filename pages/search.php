@@ -1,8 +1,9 @@
 <?php
-require_once '../inc/application.php';
 require_once '../inc/util.php';
+require_once '../inc/application.php';
+require_once '../inc/style_engine.php';
 
-sesssion_start();
+session_start();
 redirectIfLoggedOut();
 
 $title="";
@@ -14,9 +15,10 @@ if(isset($_GET['title'])){
   $title = $_GET['title'];
   $author = $_GET['author'];
   try{
-    $pages = Application->getSearchResults(
-			  $title==""? null : $title,
-			  $author==""? null : $author);
+    $A =new Application();
+    $pages = $A->getSearchResults(
+	$title==""? null : $title,
+	$author==""? null : $author);
   } catch(Exception $e){
     $message = $e->getException();
   }
@@ -53,12 +55,12 @@ if(isset($_GET['title'])){
       <input type=submit></input>
   </form>
 <?php
-echo $message
+echo $message;
 
 //display search results
 if($pages != null){
   while ($row = mysql_fetch_array($pages)){
-    echo "<div><a href='editPage?pid=".$row['id']."'>".$row['title']."</a>By <a href='profile.php?u=".$row['user']."'></a> on ".$row['created_date']."</div>";
+    echo makeSearchResult($row['id'],$row['title'],$row['user'],$row['created_date']);
   }
 }
 ?>
