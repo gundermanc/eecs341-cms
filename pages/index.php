@@ -1,18 +1,16 @@
 <?php
-$root=__DIR__."/..";
-require_once $root.'/inc/database.php';
-require_once $root.'/inc/util.php';
 
-sesssion_start();
-redirectIfLoggedOut();
+require_once '../inc/util.php';
+require_once '../inc/style_engine.php';
+
+session_start();
 
 ?>
-
 <html>
   <body>
-Welcome, <?php echo $_SESSION['userName'] ?></br>
-<a href="create.php">Create a page</a></br>
-<a href="profile.php?u="<?php echo $_SESSION['userName']?>>View my profile</a></br>
-<a href="logout.php">Logout</a></br>
+<?php
+  echo getLoginInfo();
+  echo getThingsToDo();
+?>
  </body>
 </html>

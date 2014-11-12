@@ -201,19 +201,16 @@ class Database {
     $user = $this->connection->escape_string($user);
 
     $result = $this->query("SELECT pass FROM Users U WHERE U.user='$user'");
-
     // Invalid username.
     if ($result->num_rows == 0) {
       return false;
     }
-
+    
     $passHash = $result->fetch_row()[0];
-
     // Invalid password.
     if (hash(Config::HASH_ALGO, $pass) != $passHash) {
       return false;
     }
-
     // User authentication successful.
     return true;
   }
@@ -236,7 +233,7 @@ class Database {
    * Inserts a new blank page with the given title and owner.
    * Throws: DatabaseException if a SQL error occurs, or if insertPage
    * is requested for user that doesn't exist.
-   * Returns: True if the page was created and false if not.
+   * Returns: PageId.
    */
   public function insertPage($title, $user) {
 
@@ -248,8 +245,9 @@ class Database {
     $user = $this->connection->escape_string($user);
     $date = Database::timeStamp();
 
-    return $this->query("INSERT INTO Pages (title, user, created_date) "
+    $this->query("INSERT INTO Pages (title, user, created_date) "
                         . "VALUES ('$title', '$user', '$date')");
+    return mysqli_insert_id($this->connection);
   }
 
   /**

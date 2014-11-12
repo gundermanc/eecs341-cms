@@ -1,40 +1,35 @@
 <?php
-$root=__DIR__."/..";
-require_once $root.'/inc/database.php';
+require_once '../inc/application.php';
+require_once '../inc/util.php';
 
-sesssion_start();
+session_start();
+redirectIfLoggedIn();
 
 $message="";
-$uname=""
-$pass=""
-
-//redirect if logged in
-if(isset($_SESSION['userName'])){
-    header("Location: index.php");
-}
+$uname="";
+$pass="";
 
 //when a post is recieved
 if(isset($_POST['uname'])){
   $uname=$_POST['uname'];
   $pass=$_POST['pass'];
-  //authenticate
-  $db = new Database();
-  if($db->authenticateUser($uname,$pass)){
-    //success
-    $_SESSION['userName'] = $uname;
-    header("Location: index.php");
-  } else{
-    $message="Could not log you in."
+  try{
+    $A = new Application();
+    $A->logIn($uname, $pass);
+    redirectToIndex();
+  } catch(Exception $e){
+    $message=$e->getMessage();
   }
 }
 ?>
 <html>
   <body>
     <form action="login.php" method="post">
-      Username: <input type=text name=uname maxlength=20><?php echo $uname ?></input>
-      Password: <input type=password name=pass maxlength=20><?php echo $pass ?></input>
+      Username: <input type=text name=uname maxlength=20 value="<?php echo $uname ?>"></input>
+      Password: <input type=password name=pass maxlength=20 value="<?php echo $pass ?>"></input>
       <input type=submit></input>
     </form>
 Welcome!</br><?php echo $message ?>
+<a href='register.php'>Register here</a>
  </body>
 </html>

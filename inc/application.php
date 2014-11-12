@@ -28,9 +28,9 @@ class Application {
    * Logs the player in and redirects them to the home page.
    * Returns false if not accepted
    */
-  public static function logIn($uname, $pass){
+  public function logIn($uname, $pass){
     if($this->database->authenticateUser($uname,$pass)){
-      logIn($uname);
+      setLoginTrue($uname);
       redirectToIndex();
     } else{
       return false;
@@ -40,29 +40,32 @@ class Application {
   /**
    * Adds user to the database, logs them in, and redirects them to the homepage.
    */
-  public static function registerUser($uname, $pass){
+  public function registerUser($uname, $pass){
     if($this->database->userExists($uname)){
       throw new AppException("That name is taken.");
     }
-    $this->database->insertUser($uname, $pass1);
-    logIn($user);
+    $this->database->insertUser($uname, $pass);
+    setLoginTrue($user);
     redirectToIndex();
   }
 
   /**
    * Saves a new page in the database
    */
-  public static function newPage($name){
-    return loggedIn() && $this->database->insertPage($name,getuserName());
+  public function newPage($name){
+    if(isloggedIn()){
+        return $this->database->insertPage($name,getuserName());
+    }
   }
 
-  public static function savePage($pid, $title, $text){
+  public function savePage($pid, $title, $text){
    //TODO 
   }
 
-  public static function loadPage($pid){
+  public function loadPage($pid){
     //TODO
     //return array($title, $text);
   }
 }
+
 ?>
