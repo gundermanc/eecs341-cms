@@ -336,7 +336,7 @@ class Database {
     
     
   public function queryKeywordsByWord($word) {
-    $result = $this->query("SELECT * FROM Keywords WHERE word='$word'");
+    $result = $this->query("SELECT page_id FROM Keywords WHERE word='$word'");
         
     // No pages with the specified id, return null.
     if ($result->num_rows == 0) {
@@ -533,8 +533,8 @@ class Database {
       
     // Create the keywords table.
     $this->query("CREATE TABLE Keywords ("
-                 . "page_id MEDIUMINT, "
-                 . "word VARCHAR(25), "
+                 . "page_id MEDIUMINT NOT NULL, "
+                 . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (page_id, word), "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
                  . ")");
