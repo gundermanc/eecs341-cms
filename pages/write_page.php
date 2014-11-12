@@ -13,8 +13,8 @@ if(isset($_POST['title'])){
   $title = $_POST['title'];
   try{
     $A = new Application();
-    $id = $A->newPage($title);
-    redirectToEdit($id);
+    $pageContext = $A->newPage($title, getUserName());
+    redirectToEdit($pageContext->getId());
   } catch(Exception $e){
     $message = $e->getMessage();
   }
@@ -30,6 +30,6 @@ if(isset($_POST['title'])){
     <input name="title" type="text" value="<?php echo $title ?>"></input>
     <input type=submit></input>
   </form>
-  <?php echo $message ?>
+  <?= $message ?>
  </body>
 </html>

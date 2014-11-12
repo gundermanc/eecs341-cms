@@ -34,6 +34,8 @@ function getUserName(){
   if(!isLoggedIn()){
     throw new AppException("Attempted to get user name while not logged in.");
   }
+
+  return $_SESSION['userName'];
 }
 
 function redirectIfLoggedOut() {

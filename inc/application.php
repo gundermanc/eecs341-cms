@@ -55,8 +55,8 @@ class Application {
   /**
    * Saves a new page in the database
    */
-  public static function newPage($name, $user) {
-    if (loggedIn()) {
+  public function newPage($name, $user) {
+    if (isLoggedIn()) {
       return PageContext::fromNewPage($this->database, $name, $user);
     }
   }
@@ -64,7 +64,7 @@ class Application {
   /**
    * Loads a page from the database and returns its PageContext object.
    */
-  public static function loadPage($pid){
+  public function loadPage($pid){
     return PageContext::fromDb($this->database, $pid);
   }
 }

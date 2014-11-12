@@ -570,7 +570,7 @@ class Database {
   private function query($query) {
     $result = $this->connection->query($query);
     if (!$result) {
-      throw new DatabaseException("Error occurred processing SQL statement: "
+      throw new DatabaseException("Error occurred processing SQL statement '$query': "
                                   . $this->connection->error,
                                   $this->connection->errno);
     }

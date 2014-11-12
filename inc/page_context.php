@@ -38,16 +38,16 @@ class PageContext {
   public static function fromDb($database, $pageId) {
     $pageContext = new self();
 
-    $this->database = $database;
-    $this->id = $pageId;
+    $pageContext->database = $database;
+    $pageContext->id = $pageId;
 
     // See queryPageById in database.php for schema info.
-    $record = $this->database->queryPageById($this->id);
+    $record = $pageContext->database->queryPageById($pageContext->id);
 
     // Save record to the class fields.
-    $this->title = $record[1];
-    $this->owner = $record[2];
-    $this->id = $record[3];
+    $pageContext->title = $record[1];
+    $pageContext->owner = $record[2];
+    $pageContext->id = $record[0];
 
     return $pageContext;
   }
