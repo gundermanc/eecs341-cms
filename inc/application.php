@@ -1,6 +1,7 @@
 <?php
 
 require_once('database.php');
+require_once('page_context.php');
 require_once('util.php');
 
 /**
@@ -9,6 +10,8 @@ require_once('util.php');
  * checking user permissions (e.g.: users can't delete other's comments), etc.
  */
 class Application {
+
+  private $database;
 
   /**
    * Creates an application instance.
@@ -52,19 +55,17 @@ class Application {
   /**
    * Saves a new page in the database
    */
-  public function newPage($name){
-    if(isloggedIn()){
-        return $this->database->insertPage($name,getuserName());
+  public function newPage($name, $user) {
+    if (isLoggedIn()) {
+      return PageContext::fromNewPage($this->database, $name, $user);
     }
   }
 
-  public function savePage($pid, $title, $text){
-   //TODO 
-  }
-
+  /**
+   * Loads a page from the database and returns its PageContext object.
+   */
   public function loadPage($pid){
-    //TODO
-    //return array($title, $text);
+    return PageContext::fromDb($this->database, $pid);
   }
 }
 

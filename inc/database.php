@@ -233,7 +233,7 @@ class Database {
    * Inserts a new blank page with the given title and owner.
    * Throws: DatabaseException if a SQL error occurs, or if insertPage
    * is requested for user that doesn't exist.
-   * Returns: PageId.
+   * Returns: The ID of the page that was inserted.
    */
   public function insertPage($title, $user) {
 
@@ -245,9 +245,9 @@ class Database {
     $user = $this->connection->escape_string($user);
     $date = Database::timeStamp();
 
-    $this->query("INSERT INTO Pages (title, user, created_date) "
-                        . "VALUES ('$title', '$user', '$date')");
-    return mysqli_insert_id($this->connection);
+    $this->query("INSERT INTO Pages (title, user, created_date, cached_data) "
+                 . "VALUES ('$title', '$user', '$date', '')");
+    return $this->connection->insert_id;
   }
 
   /**
@@ -267,7 +267,8 @@ class Database {
    * or null if the page doesn't exist.
    */
   public function queryPageById($pageId) {
-    $result = $this->query("SELECT * FROM Pages WHERE id=$pageId");
+    $result = $this->query("SELECT (id, title, user, created_date) "
+                           . "FROM Pages WHERE id=$pageId");
 
     // No pages with the specified id, return null.
     if ($result->num_rows == 0) {
@@ -275,6 +276,34 @@ class Database {
     }
 
     return $result->fetch_row();
+  }
+
+  /**
+   * Queries a page's cached content by the page ID.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The current cached page content as a string,
+   * or null if the page doesn't exist.
+   */
+  public function queryPageCachedData($pageId) {
+    $result = $this->query("SELECT (cached_data) "
+                           . "FROM Pages WHERE id=$pageId");
+
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+      return null;
+    }
+
+    return $result->fetch_row()[0];
+  }
+
+  /**
+   * Update's a page's cached content.
+   * Throws: DatabaseException if there is a SQL error.
+   * Returns: True if everything is ok, and false if there was
+   * an error.
+   */
+  public function updatePageCachedData($pageId, $data) {
+    return $this->query("UPDATE Pages SET cached_data='$data' WHERE id=$pageId");
   }
 
   /**
@@ -300,7 +329,8 @@ class Database {
 
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
-    $queryStr = "SELECT * FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
+    $queryStr = "SELECT (id, title, user, created_date) "
+      . "FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
 
     $result = $this->query($queryStr);
 
@@ -313,15 +343,13 @@ class Database {
    * Throws: DatabaseException if there is a SQL error.
    * Returns: Nothing.
    */
-  public function insertChange($user, $pageId, $parentId,  
-                               $contribDiff, $approved = null) {
+  public function insertChange($user, $pageId, $contribDiff, $approved = null) {
     $user = $this->connection->escape_string($user);
     $contribDiff = $this->connection->escape_string($contribDiff);
     $date = Database::timeStamp();
-    $parentId = $parentId == null ? "NULL" : $parentId;
 
-    if (strlen($contribDiff) > Database::MAX_DIFF) {
-      throw new DiffTooLongException(Database::MAX_DIFF);
+    if (strlen($contribDiff) > Database::DIFF_MAX) {
+      throw new DiffTooLongException(Database::DIFF_MAX);
     }
 
     if ($approved == null) {
@@ -333,9 +361,11 @@ class Database {
     }
 
     $this->query("INSERT INTO Changes (approved, contrib_diff, "
-                 . "change_date, user, page_id, parent_id) "
+                 . "change_date, user, page_id) "
                  . "VALUES ($approved, '$contribDiff', '$date', "
-                 . "'$user', $pageId, $parentId)");
+                 . "'$user', $pageId)");
+
+    return $this->connection->insert_id;
   }
 
   /**
@@ -352,19 +382,56 @@ class Database {
    * Get changes for a page by its pageId.
    * Throws: DatabaseException if SQL error.
    * Returns: an array of "Changes" arrays of form
-   * (id, approved, contrib_diff, change_date, user, page_id, parent_id)
+   * (id, approved, contrib_diff, change_date, user, page_id)
    */
-  public function queryChangesByPage($pageId) {
-    $result = $this->query("SELECT * FROM Changes WHERE page_id='$pageId'");
+  public function queryChangesByPage($pageId, $approved) {
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    $result = $this->query("SELECT * FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");
 
     return $result->fetch_all();
   }
 
   /**
+   * Get changes diffs for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: a numeric array of diff strings.
+   */
+  public function queryApprovedChangesDiffs($pageId, $approved) {
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    $result = $this->query("SELECT contrib_diff FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved ORDER BY id ASC");
+
+    $ilkFormat = $result->fetch_all(MYSQLI_NUM);
+
+    // Convert ridiculous array of arrays to a nice array of strings.
+    // Sure PHP or MySQLi has a function for this but couldn't find it.
+    $niceFormat = array();
+    for ($i = 0; $i < count($ilkFormat); $i++) {
+      $niceFormat[] = $ilkFormat[$i][0];
+    }
+
+    return $niceFormat;
+  }
+
+  /**
    * Approves or denies a change entry.
    * Throws: DatabaseException if there is a SQL error.
-   * Returns: True if everything is ok, and false if there was
-   * an error.
+   * Returns: Nothing.
    */
   public function updateChangeApproved($changeId, $approved) {
     if ($approved == null) {
@@ -375,7 +442,7 @@ class Database {
       $approved = "FALSE";
     }
 
-    return $this->query("UPDATE Changes SET approved=$approved WHERE id=$changeId");
+    $this->query("UPDATE Changes SET approved=$approved WHERE id=$changeId");
   }
 
   /**
@@ -449,11 +516,11 @@ class Database {
 
     // Create users table.
     $this->query("CREATE TABLE Users ("
-                     . "user VARCHAR(25), "
-                     . "pass VARCHAR(64) NOT NULL, "
-                     . "join_date DATETIME NOT NULL, "
-                     . "PRIMARY KEY(user) "
-                     . ")");
+                 . "user VARCHAR(25), "
+                 . "pass VARCHAR(64) NOT NULL, "
+                 . "join_date DATETIME NOT NULL, "
+                 . "PRIMARY KEY(user) "
+                 . ")");
 
     // Create admin user account.
     $this->insertUser(Config::ADMIN_USER, Config::ADMIN_PASS);
@@ -464,6 +531,7 @@ class Database {
                  . "title VARCHAR(255) NOT NULL, "
                  . "user VARCHAR(25), "
                  . "created_date DATETIME NOT NULL, "
+                 . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user)"
                  . ")");
@@ -476,11 +544,9 @@ class Database {
                  . "change_date DATETIME NOT NULL, "
                  . "user VARCHAR(25) NOT NULL, "
                  . "page_id MEDIUMINT NOT NULL, "
-                 . "parent_id MEDIUMINT, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id), "
-                 . "FOREIGN KEY (parent_id) REFERENCES Changes(id)"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
                  . ")");
 
     // Create the views table.
@@ -504,7 +570,7 @@ class Database {
   private function query($query) {
     $result = $this->connection->query($query);
     if (!$result) {
-      throw new DatabaseException("Error occurred processing SQL statement: "
+      throw new DatabaseException("Error occurred processing SQL statement '$query': "
                                   . $this->connection->error,
                                   $this->connection->errno);
     }

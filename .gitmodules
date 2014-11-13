@@ -1,0 +1,3 @@
+[submodule "third_party/diff_match_patch_php"]
+	path = third_party/diff_match_patch_php
+	url = https://github.com/nuxodin/diff_match_patch-php.git
