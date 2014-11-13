@@ -358,7 +358,7 @@ class Database {
         return null;
     }
         
-    return $result->fetch_row();
+    return $result;
   }
     
     
@@ -579,7 +579,7 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE NO ACTION"
                  . ")");
 
     // Create the changes table.
@@ -588,11 +588,11 @@ class Database {
                  . "approved BOOLEAN, "
                  . "contrib_diff VARCHAR(1000) NOT NULL, "
                  . "change_date DATETIME NOT NULL, "
-                 . "user VARCHAR(25) NOT NULL, "
+                 . "user VARCHAR(25) , "
                  . "page_id MEDIUMINT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user), ON DELETE SET NULL"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
       
     // Create the keywords table.
@@ -600,7 +600,7 @@ class Database {
                  . "page_id MEDIUMINT NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (page_id, word), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
 
     // Create the views table.
@@ -610,8 +610,8 @@ class Database {
                  . "rating TINYINT NOT NULL, "
                  . "comment VARCHAR(255), "
                  . "PRIMARY KEY (user, page_id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user), ON DELETE CASCADE"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
   }
 
