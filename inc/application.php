@@ -74,6 +74,13 @@ class Application {
   public static function getSearchResults($title, $author, $keywords){
    return $this->database->queryPages($search,$author);
   }
+
+  /**
+   * Returns an array of page arrays, of the form (id, title, user, created_date).
+   */
+  public static function getSearchResults($title, $author, $keywords){
+   return $this->database->queryPages($search,$author);
+  }
 }
 
 ?>
