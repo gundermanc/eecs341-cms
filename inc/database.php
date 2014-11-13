@@ -336,6 +336,52 @@ class Database {
 
     return $result->fetch_all();
   }
+  
+  /**
+   * Inserts a new keyword associated with a page
+   */
+  public function insertKeyword($page_id, $word) {
+    $page_id = $this->connection->escape_string($page_id);
+    $word = $this->connection->escape_string($word);
+      
+    $this->query("INSERT INTO Keywords (page_id, word)"
+                   . " VALUES ('$page_id', '$word')");
+  }
+   
+    
+    
+  public function queryKeywordsByPageId($pageId) {
+    $result = $this->query("SELECT * FROM Keywords WHERE page_id=$pageId");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_row();
+  }
+    
+    
+    
+  public function queryKeywordsByWord($word) {
+    $result = $this->query("SELECT page_id FROM Keywords WHERE word='$word'");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result;
+  }
+    
+  /**
+   * Deletes a keyword that is associated with a page.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: true, or false if an error occurs.
+   */
+  public function deleteKeyword($page_id, $word) {
+    return $this->query("DELETE FROM Keywords WHERE page_id=$page_id AND word=$word");
+  }
 
   /**
    * Inserts a new change record into the database. Note: actual diffing
@@ -546,6 +592,14 @@ class Database {
                  . "page_id MEDIUMINT NOT NULL, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user), "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . ")");
+      
+    // Create the keywords table.
+    $this->query("CREATE TABLE Keywords ("
+                 . "page_id MEDIUMINT NOT NULL, "
+                 . "word VARCHAR(25) NOT NULL, "
+                 . "PRIMARY KEY (page_id, word), "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
                  . ")");
 
