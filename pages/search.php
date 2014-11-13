@@ -23,7 +23,7 @@ if(isset($_GET['title'])){
 	$author==""? null : $author,
 	$keywords==""? null : $keywords);
   } catch(Exception $e){
-    $message = $e->getException();
+    $message = $e->getMessage();
   }
 }
 
@@ -67,7 +67,7 @@ echo $message;
 
 //display search results
 if($pages != null){
-  while ($row = mysql_fetch_array($pages)){
+  foreach($pages as $row){
     echo makeSearchResult($row['id'],$row['title'],$row['user'],$row['created_date']);
   }
 }

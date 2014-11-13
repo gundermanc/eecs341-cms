@@ -275,7 +275,7 @@ class Database {
       return null;
     }
 
-    return $result->fetch_row();
+    return $result;
   }
 
   /**
