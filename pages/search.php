@@ -9,6 +9,7 @@ redirectIfLoggedOut();
 $title="";
 $author="";
 $message="";
+$keywords="";
 $pages=null;
 
 if(isset($_GET['title'])){
@@ -19,7 +20,7 @@ if(isset($_GET['title'])){
     $A =new Application();
     $pages = $A->getSearchResults(
 	$title==""? null : $title,
-	$author==""? null : $author
+	$author==""? null : $author,
 	$keywords==""? null : $keywords);
   } catch(Exception $e){
     $message = $e->getException();
@@ -52,10 +53,10 @@ if(isset($_GET['title'])){
   <form action="search.php" method="get">
       Search by title: <input type=text name=title maxlength=20 value="<?php echo $title ?>"></input>
       <!-- advanced search -->
-      <span id="toggle" onclick=openAdv()>Advanced Search</span>
+      </br><span id="toggle" onclick=openAdv()>Advanced Search</span>
       <span id="adv">
 	Search by author: <input type=text name=author maxlength=20 value="<?php echo $author ?>"></input></br>
-	Search by keywords(separated by commas): <input type=text name=keywords maxlength=20 value="<?php echo keywords ?>"></input></br>
+	Search by keywords(separated by commas): <input type=text name=keywords maxlength=20 value="<?php echo $keywords ?>"></input></br>
 	% is unlimited chars</br>
 	_ is any one char
       </span>
