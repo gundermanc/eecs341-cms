@@ -267,9 +267,10 @@ class Database {
    * or null if the page doesn't exist.
    */
   public function queryPageById($pageId) {
-    $result = $this->query("SELECT (id, title, user, created_date) "
+    $result = $this->query("SELECT id, title, user, created_date "
                            . "FROM Pages WHERE id=$pageId");
 
+      #return null;
     // No pages with the specified id, return null.
     if ($result->num_rows == 0) {
       return null;
@@ -351,14 +352,14 @@ class Database {
     
     
   public function queryKeywordsByPageId($pageId) {
-    $result = $this->query("SELECT * FROM Keywords WHERE page_id=$pageId");
+    $result = $this->query("SELECT * FROM Keywords WHERE page_id='$pageId'");
         
     // No pages with the specified id, return null.
     if ($result->num_rows == 0) {
         return null;
     }
         
-    return $result->fetch_row();
+    return $result->fetch_all();
   }
     
     
@@ -371,7 +372,7 @@ class Database {
         return null;
     }
         
-    return $result;
+    return $result->fetch_all();
   }
     
   /**
@@ -579,7 +580,7 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL"
                  . ")");
 
     // Create the changes table.
@@ -588,11 +589,11 @@ class Database {
                  . "approved BOOLEAN, "
                  . "contrib_diff VARCHAR(1000) NOT NULL, "
                  . "change_date DATETIME NOT NULL, "
-                 . "user VARCHAR(25) NOT NULL, "
+                 . "user VARCHAR(25) , "
                  . "page_id MEDIUMINT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL, "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
       
     // Create the keywords table.
@@ -600,7 +601,7 @@ class Database {
                  . "page_id MEDIUMINT NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (page_id, word), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
 
     // Create the views table.
@@ -610,8 +611,8 @@ class Database {
                  . "rating TINYINT NOT NULL, "
                  . "comment VARCHAR(255), "
                  . "PRIMARY KEY (user, page_id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
   }
 
