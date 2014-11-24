@@ -23,7 +23,7 @@
                   <?php 
                      $root = Config::APP_ROOT;
                      if(isLoggedIn()) {
-                       echo "<a href=\"$root/pages/register.php\">Logout " . getUserName() . "</a>";
+                       echo "<a href=\"$root/pages/logout.php\">Logout " . getUserName() . "</a>";
                      } else {
                        echo "<a href=\"$root/pages/login.php\">Login</a>";
                      }
