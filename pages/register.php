@@ -47,7 +47,7 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Register");
         Username:
       </td>
       <td>
-        <input type=text name=uname maxlength=20 value="<?php echo $uname ?>"></input>
+        <input type="text" name="uname" maxlength="20" value="<?php echo $uname ?>"></input>
       </td>
     </tr>
     <tr>
@@ -55,14 +55,14 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Register");
         Password:
       </td>
       <td>
-        <input type=password name=pass1 maxlength=20 value="<?php echo $pass1 ?>" />
+        <input type="password" name="pass1" maxlength="20" />
       </td>
     <tr>
       <td>
         Password again:
       </td>
       <td>
-        <input type=password name=pass2 maxlength=20 value="<?php echo $pass2 ?>"></input>
+        <input type="password" name="pass2" maxlength="20"></input>
       </td>
     </tr>
   </table>

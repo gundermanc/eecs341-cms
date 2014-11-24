@@ -11,7 +11,7 @@ $app = new Application();
 
 // If user is logged in, take them to their profile instead.
 if (isLoggedIn()) {
-  redirectToProfile();
+//  redirectToProfile();
 }
 
 // Insert the page HTML header with chosen title.
