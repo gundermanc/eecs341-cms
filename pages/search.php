@@ -68,7 +68,7 @@ echo $message;
 //display search results
 if($pages != null){
   foreach($pages as $row){
-    echo makeSearchResult($row['id'],$row['title'],$row['user'],$row['created_date']);
+    echo makeSearchResult($row[0],$row[1],$row[2],$row[3]);
   }
 }
 ?>

@@ -267,7 +267,7 @@ class Database {
    * or null if the page doesn't exist.
    */
   public function queryPageById($pageId) {
-    $result = $this->query("SELECT (id, title, user, created_date) "
+    $result = $this->query("SELECT id, title, user, created_date "
                            . "FROM Pages WHERE id=$pageId");
 
     // No pages with the specified id, return null.
@@ -275,7 +275,7 @@ class Database {
       return null;
     }
 
-    return $result;
+    return $result->fetch_row();
   }
 
   /**
@@ -329,7 +329,7 @@ class Database {
 
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
-    $queryStr = "SELECT (id, title, user, created_date) "
+    $queryStr = "SELECT id, title, user, created_date "
       . "FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
 
     $result = $this->query($queryStr);

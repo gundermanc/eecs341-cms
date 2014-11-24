@@ -24,7 +24,7 @@ function getThingsToDo(){
 }
 
 function makeSearchResult($pid, $title, $user, $created_date){
-  return "<div><a href='edit_page?pid=$pid'>$title</a>By <a href='profile.php?u=$user'></a> on $created_date</div>";
+  return "<div><a href='../pages/view_page.php?pid=$pid'>$title</a>By <a href='profile.php?u=$user'>$user</a> on $created_date</div>";
 }
 
 ?>
