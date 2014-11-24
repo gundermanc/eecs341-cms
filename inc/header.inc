@@ -14,7 +14,26 @@
             <img src="<?=Config::APP_ROOT?>/pixmaps/logo.png"/>
           </td>
           <td>
-            <!-- Menu goes here -->
+            <table style="border-bottom: solid 2px #000;">
+              <tr>
+                <td style="padding-left:15px;">
+                  <a href="<?=Config::APP_ROOT?>/pages">Home</a>
+                </td>
+                <td style="padding-left:25px;">
+                  <?php 
+                     $root = Config::APP_ROOT;
+                     if(isLoggedIn()) {
+                       echo "<a href=\"$root/pages/register.php\">Logout " . getUserName() . "</a>";
+                     } else {
+                       echo "<a href=\"$root/pages/login.php\">Login</a>";
+                     }
+                  ?>
+                </td style="padding-left:25px;">
+                <td style="padding-left:25px;">
+                  <a href="<?=Config::APP_ROOT?>/pages/register.php">Register</a>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
