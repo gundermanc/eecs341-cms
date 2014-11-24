@@ -13,7 +13,7 @@ class Config {
   // SQL Server login information.
   const SQL_SERVER = "localhost";
   const SQL_USER = "root";
-  const SQL_PASS = "";
+  const SQL_PASS = "Lexie1@3axiom";
   const SQL_DB = "EECS341Db";
 
   // Password Hashing algorithm.

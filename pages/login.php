@@ -27,7 +27,7 @@ if(isset($_POST['uname'])){
 }
 
 // Insert the page HTML header with chosen title.
-StyleEngine::insertHeader($app, "Page Title");
+StyleEngine::insertHeader($app, Config::APP_NAME . " - Login");
 
 /* Begin page content: */ ?>
 
