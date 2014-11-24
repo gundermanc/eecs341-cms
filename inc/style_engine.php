@@ -19,7 +19,12 @@ function getLoginInfo(){
 function getThingsToDo(){
   return "<div id='toDo'>
   <a href='write_page.php'>Create</a></br>".(isLoggedIn() ? 
-  "<a href=''>blah2</a>" : "").
+  "<a href='search.php'>search pages</a>" : "").
   "</div>";
 }
+
+function makeSearchResult($pid, $title, $user, $created_date){
+  return "<div><a href='../pages/view_page.php?pid=$pid'>$title</a>By <a href='profile.php?u=$user'>$user</a> on $created_date</div>";
+}
+
 ?>
