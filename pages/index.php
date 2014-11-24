@@ -6,13 +6,10 @@ require_once('../inc/util.php');
 
 session_start();
 
+redirectIfLoggedIn();
+
 // Get an application context.
 $app = new Application();
-
-// If user is logged in, take them to their profile instead.
-if (isLoggedIn()) {
-//  redirectToProfile();
-}
 
 // Insert the page HTML header with chosen title.
 StyleEngine::insertHeader($app, Config::APP_NAME . " - Home");

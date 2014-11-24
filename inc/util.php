@@ -8,7 +8,7 @@ function redirectIfNotLoggedIn(){
 
 function redirectIfLoggedIn(){
   if(isLoggedIn()){
-    redirectToIndex();
+    redirectToProfile();
   }
 }
 
@@ -35,13 +35,6 @@ function getUserName(){
     throw new AppException("Attempted to get user name while not logged in.");
   }
 
-  return $_SESSION['userName'];
-}
-
-function redirectIfLoggedOut() {
-  if(!isset($_SESSION['userName'])){
-    header("Location: login.php");
-  }
   return $_SESSION['userName'];
 }
 
