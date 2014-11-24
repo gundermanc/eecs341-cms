@@ -9,27 +9,45 @@ redirectIfNotLoggedIn();
 $title="";
 $message="";
 
+// Get an application context.
+$app = new Application();
+
 if(isset($_POST['title'])){
   $title = $_POST['title'];
   try{
-    $A = new Application();
-    $pageContext = $A->newPage($title, getUserName());
+    $pageContext = $app->newPage($title, getUserName());
     redirectToEdit($pageContext->getId());
   } catch(Exception $e){
     $message = $e->getMessage();
   }
 }
+
+// Insert the page HTML header with chosen title.
+StyleEngine::insertHeader($app, Config::APP_NAME . " - New Page");
+/* Begin page content: */ ?>
+
+<h3>Create new page</h3>
+<p>
+  <span style="color:#FF0000;"> <?php echo $message ?> </span>
+</p>
+<form action="write_page.php" method="post">
+  <table>
+    <tr>
+      <td>
+        Title:
+      </td>
+      <td>
+        <input type="text" name="title" maxlength="250" value="<?php echo $title ?>"></input>
+      </td>
+    </tr>
+  </table>
+  <br />
+  <input type=submit></input>
+</form>
+
+
+<?php /* End page content. */
+// Insert the page HTML footer.
+StyleEngine::insertFooter($app);
+
 ?>
-<html>
-  <body>
-<?php 
-  echo getLoginInfo();
-  echo getThingsToDo();
-?>
-  <form action="write_page.php" method="post">
-    <input name="title" type="text" value="<?php echo $title ?>"></input>
-    <input type=submit></input>
-  </form>
-  <?= $message ?>
- </body>
-</html>

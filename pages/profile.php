@@ -4,7 +4,6 @@ require_once('../inc/application.php');
 require_once('../inc/style_engine.php');
 
 session_start();
-
 redirectIfNotLoggedIn();
 
 // Get an application context.
@@ -15,14 +14,13 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 
 /* Begin page content: */ ?>
 
-
-
 <h2>Profile of <?=getUserName()?></h2>
-
-<p>
-  This is an example page.
-</p>
-
+<h4>My Pages</h4>
+<table>
+  <tr>
+    <td><a href="write_page.php">Create page</a></td>
+  </tr>
+</table>
 
 
 

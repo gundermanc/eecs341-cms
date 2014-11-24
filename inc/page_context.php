@@ -124,7 +124,6 @@ class PageContext {
     // Gets all the changes associated with this page.
     $diffsArray = $this->database->queryApprovedChangesDiffs($this->id, true);
 
-    echo var_dump($diffsArray);
     // Build the page content from the diffs history.
     $content = DeltaEncoder::assembleDeltas($diffsArray);
 

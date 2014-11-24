@@ -58,6 +58,7 @@ StyleEngine::insertHeader($app, "Page Title");
       <td>
         <input type="password" name="pass" maxlength="20" />
       </td>
+    </tr>
   </table>
   <br />
   <input type=submit></input>

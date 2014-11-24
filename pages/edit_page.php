@@ -11,26 +11,25 @@ $title="";
 $text="";
 $pid="";
 
+// Get an application context.
+$app = new Application();
+
 if(isset($_POST['pid'])){
-  $title=$_POST['title'];
+  //  $title=$_POST['title'];
   $text=$_POST['text'];
   $pid= $_POST['pid'];
   try{
-    $A=new Application();
-    $pageContext = $A->loadPage($pid);
+    $pageContext = $app->loadPage($pid);
     // TODO: currently no way to update title.
     // TODO: currently auto accepts each change. Fix when approvals page is done.
     $pageContext->submitChange(getUserName(), $text, true);
   } catch(Exception $e){
     $message=$e->getMessage();
   }
-}
-
-else if(isset($_GET['pid'])){
+} else if(isset($_GET['pid'])){
   $pid=$_GET['pid'];
   try{
-    $A=new Application();
-    $pageContext = $A->loadPage($pid);
+    $pageContext = $app->loadPage($pid);
     $title = $pageContext->getTitle();
     $text = $pageContext->queryContent();
     $pid = $pageContext->getId();
@@ -39,19 +38,25 @@ else if(isset($_GET['pid'])){
   }
 }
 
-?>
-<html>
-  <body>
-<?php 
-  echo getLoginInfo();
-  echo getThingsToDo();
-?>
-  <form action="edit_page.php" method="post">
-    Title:<input name="title" type="text" value="<?= $title?>"></input></br>
-    Text:<input name="text" type='textArea' id='input' value="<?= $text ?>"></input></br>
-    <input name="pid" type="hidden" value="<?= $pid ?>">
-    <input type=submit></input>
+// Insert the page HTML header with chosen title.
+StyleEngine::insertHeader($app, Config::APP_NAME . " - Edit");
+
+/* Begin page content: */ ?>
+
+<h3>Editing <i><?=$title?></i></input></h3>
+<p>
+  <span style="color:#FF0000;"> <?php echo $message ?> </span>
+</p>
+<form action="edit_page.php" method="post">
+  <input type=submit value="Update Page"></input>
+  <textarea name="text" style="width:100%;height:100%;" id='input'><?= $text ?></textarea>
+  <input name="pid" type="hidden" value="<?= $pid ?>">
   </form>
-  <?php echo $message ?>
  </body>
 </html>
+
+<?php /* End page content. */
+// Insert the page HTML footer.
+StyleEngine::insertFooter($app);
+
+?>
