@@ -62,4 +62,8 @@ function redirectToIndex(){
 function redirectToEdit($pid){
   header("Location: edit_page.php?pid=$pid");
 }
+
+function redirectToProfile() {
+  header("Location: profile.php");
+}
 ?>
