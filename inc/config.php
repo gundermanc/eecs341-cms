@@ -7,6 +7,8 @@
 class Config {
   // Global Application Name String, printed in UI.
   const APP_NAME = "EECS 341 Project";
+  const APP_ROOT = "/~christian";
+  const COPYRIGHT = "&copy 2014 Christian Gunderman, Elliot Essman, Karen Zoeller";
 
   // SQL Server login information.
   const SQL_SERVER = "localhost";
