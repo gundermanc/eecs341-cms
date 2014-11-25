@@ -15,7 +15,7 @@ $pid="";
 $app = new Application();
 
 if(isset($_POST['pid'])){
-  //  $title=$_POST['title'];
+  $title=$_POST['title'];
   $text=$_POST['text'];
   $pid= $_POST['pid'];
   try{
@@ -49,8 +49,10 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Edit");
 </p>
 <form action="edit_page.php" method="post">
   <input type=submit value="Update Page"></input>
+  <a href="view_page.php?pid=<?= $pid ?>" > View Page </a>
   <textarea name="text" style="width:100%;height:100%;" id='input'><?= $text ?></textarea>
   <input name="pid" type="hidden" value="<?= $pid ?>">
+  <input name="title" type="hidden" value="<?= $title ?>">
   </form>
  </body>
 </html>
