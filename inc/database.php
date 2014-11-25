@@ -403,6 +403,8 @@ class Database {
       
     $this->query("INSERT INTO Expert (user, word)"
                    . " VALUES ('$user', '$word')");
+
+
   }
 
  /**
@@ -592,6 +594,7 @@ class Database {
     try {
       $this->query("REPLACE INTO Views (user, page_id $columns) "
                    . "VALUES ('$user', $pageId$values)");
+      $this->checkRating($pageId);
     } catch (DatabaseException $ex) {
 
       // FOREIGN KEY Constraint: Incorrect username or page.
@@ -601,6 +604,40 @@ class Database {
         throw $ex;
       }
     }
+  }
+
+  private function checkRating($page_id){
+    $keyword=$this->queryKeywordsByPageId($page_id);
+    $keyword=$keyword[0][1];
+    $result=$this->query("SELECT user FROM Pages WHERE id='$page_id'");
+    $author=$result->fetch_row();
+    $author=$author[0];
+
+    if($this->queryExpertsByKeyword($keyword)==null){
+     $this->insertExpert($author, $keyword);
+    }
+    else{
+      $result=$this->query("SELECT user FROM Expert WHERE word='$keyword'");
+      $currExpert=$result->fetch_row();
+      $currExpert=$currExpert[0];
+      
+      if ($author!=$currExpert){
+        $expertRating=$this->query("SELECT AVG(rating) " 
+          . "FROM Pages P, Keywords K, Views V "
+          . "WHERE P.user='$currExpert' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
+        $expertRating=$expertRating->fetch_row();
+        $newRating=$this->query("SELECT AVG(rating) " 
+          . "FROM Views V, Pages P, Keywords K "
+          . "WHERE P.user='$author' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
+        $newRating=$newRating->fetch_row();
+
+        if($newRating[0]>$expertRating[0]){
+          $this->deleteExpert($currExpert, $keyword);
+          $this->insertExpert($author,$keyword);
+        }
+      }
+    }
+
   }
 
   /**
@@ -674,7 +711,7 @@ class Database {
     $this->query("CREATE TABLE Expert ("
                  . "user VARCHAR(25) NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
-                 . "PRIMARY KEY (user, word), "
+                 . "PRIMARY KEY (word), "
                  . "FOREIGN KEY (user) REFERENCES Users(user), "
                  . "FOREIGN KEY (word) REFERENCES Keywords(word)"
                  . ")");
@@ -690,8 +727,29 @@ class Database {
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
 
+    /*$this->query("CREATE TRIGGER test "
+                  . "BEFORE INSERT ON Pages "
+                  . "FOR EACH ROW SET NEW.title='Hi'");*/
+
+    /*$this->query("CREATE TRIGGER checkRating "
+                  . "BEFORE INSERT ON Views "
+                  . "FOR EACH ROW "
+                  //. "BEGIN "
+                  . "SET NEW.rating = NEW.rating+1"
+                  //. "testTriggerFunction()"
+                  //. "END"
+                  . ")");*/
+
     
   }
+
+  /*private function  testTriggerFunction($page_id){
+    $keyword=queryKeywordsByPageId($page_Id);
+    $author=$this->query("SELECT user FROM Pages WHERE page_id='$page_id'");
+
+    insertExpert($author, $keyword);
+
+  }*/
 
   /**
    * Performs a SQL query on the current DB instance.
