@@ -27,7 +27,11 @@ function makeSearchResult($pid, $title, $user, $created_date){
 }
 
 function makeProfilePageEntry($pid, $title, $created_date){
-  return "<tr><td><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a></td><td> Created $created_date</div></td></tr>";
+    $context = PageContext::fromDb(new Database, $pid);
+    $numPendingChanges = $context->numPendingChanges(getUserName());
+    $display = "<tr><td><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a></td><td> Created $created_date</div></td><td>".
+               ":<a href='".Config::APP_ROOT ."/pages/changes.php?pid=$pid'> $numPendingChanges pending </a></td></tr>";
+    return $display;
 }
 
 ?>

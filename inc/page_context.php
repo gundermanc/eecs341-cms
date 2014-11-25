@@ -90,7 +90,32 @@ class PageContext {
 
     return $id;
   }
-
+  
+  /**
+   *Returns a list of unapproved changes made to this page
+   *(id, approved, contrib_diff, change_date, user, page_id)
+   */
+  public function pendingChanges($user){
+    //only the author can see the changes
+    if($user != $this->owner){
+      throw new Exception("You cannot view pending changes if you are not the owner");
+    }
+    $array = $this->database->queryChangesByPage($this->id,null/*not approved*/);
+    return $array;
+  }
+  
+  /**
+   *Returns the amount of unapproved changes made to this page
+   */
+  public function numPendingChanges($user){
+    //only the author can see the changes
+    if($user != $this->owner){
+      throw new Exception("You cannot view pending changes if you are not the owner");
+    }
+    $num = $this->database->queryNumChangesByPage($this->id,true/*not approved*/);
+    return $num;
+  }
+  
   /**
    * Approves or rejects a pending change. Approved is a boolean.
    * Rebuilds content cache from the diffs library.

@@ -445,6 +445,26 @@ class Database {
 
     return $result->fetch_all();
   }
+  
+  /**
+   * Gets the amount of changes for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: an int
+   */
+  public function queryNumChangesByPage($pageId, $approved) {
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    $result = $this->query("SELECT count(*) FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");
+
+    return $result->fetch_row()[0];
+  }
 
   /**
    * Get changes diffs for a page by its pageId.
