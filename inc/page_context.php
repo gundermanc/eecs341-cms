@@ -93,7 +93,7 @@ class PageContext {
   
   /**
    *Returns a list of unapproved changes made to this page
-   *(id, approved, contrib_diff, change_date, user, page_id)
+   *(id, approved, change_date, user, page_id)
    */
   public function pendingChanges($user){
     //only the author can see the changes
@@ -112,7 +112,7 @@ class PageContext {
     if($user != $this->owner){
       throw new Exception("You cannot view pending changes if you are not the owner");
     }
-    $num = $this->database->queryNumChangesByPage($this->id,true/*not approved*/);
+    $num = $this->database->queryNumChangesByPage($this->id,null/*not approved*/);
     return $num;
   }
   

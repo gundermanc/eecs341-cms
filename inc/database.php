@@ -429,7 +429,7 @@ class Database {
    * Get changes for a page by its pageId.
    * Throws: DatabaseException if SQL error.
    * Returns: an array of "Changes" arrays of form
-   * (id, approved, contrib_diff, change_date, user, page_id)
+   * (id, approved, change_date, user, page_id)
    */
   public function queryChangesByPage($pageId, $approved) {
     if ($approved == null) {
@@ -440,8 +440,9 @@ class Database {
       $approved = "FALSE";
     }
 
-    $result = $this->query("SELECT * FROM Changes WHERE page_id='$pageId' "
-                           . "AND approved=$approved");
+    /*$result = $this->query("SELECT id,approved,change_date,user FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");*/
+      $result = $this->query("SELECT id,approved,change_date,user FROM Changes WHERE page_id=$pageId AND id not in (select id from Changes where page_id=$pageId and approved=true)");
 
     return $result->fetch_all();
   }
@@ -460,8 +461,9 @@ class Database {
       $approved = "FALSE";
     }
 
-    $result = $this->query("SELECT count(*) FROM Changes WHERE page_id='$pageId' "
-                           . "AND approved=$approved");
+    /*$result = $this->query("SELECT COUNT(*) as count FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");*/
+    $result = $this->query("SELECT Count(*) FROM Changes WHERE page_id=$pageId AND id not in (select id from Changes where page_id=$pageId and approved=true)");
 
     return $result->fetch_row()[0];
   }
