@@ -614,6 +614,14 @@ class Database {
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
+
+    $this->query("CREATE TABLE Expert ("
+                 . "user VARCHAR(25) NOT NULL, "
+                 . "word VARCHAR(25) NOT NULL, "
+                 . "PRIMARY KEY (user, word), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user), "
+                 . "FOREIGN KEY (word) REFERENCES Keywords(word)"
+                 . ")");
   }
 
   /**
