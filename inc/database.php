@@ -350,7 +350,12 @@ class Database {
   }
    
     
-    
+ /**
+   * Queries the keyword table by the page's ID
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The specified tuple as an array,
+   * or null if the page doesn't exist.
+   */ 
   public function queryKeywordsByPageId($pageId) {
     $result = $this->query("SELECT * FROM Keywords WHERE page_id='$pageId'");
         
@@ -363,7 +368,12 @@ class Database {
   }
     
     
-    
+  /**
+   * Queries the keyword table by the keyword
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: All pages with the keyword as an array (page_id, keyword),
+   * or null if the keyword doesn't exist.
+   */  
   public function queryKeywordsByWord($word) {
     $result = $this->query("SELECT page_id FROM Keywords WHERE word='$word'");
         
@@ -381,7 +391,63 @@ class Database {
    * Returns: true, or false if an error occurs.
    */
   public function deleteKeyword($page_id, $word) {
-    return $this->query("DELETE FROM Keywords WHERE page_id=$page_id AND word=$word");
+    return $this->query("DELETE FROM Keywords WHERE page_id='$page_id' AND word='$word'");
+  }
+
+  /**
+   * Inserts a new expert into the expert table
+   */
+  public function insertExpert($user, $word) {
+    $user = $this->connection->escape_string($user);
+    $word = $this->connection->escape_string($word);
+      
+    $this->query("INSERT INTO Expert (user, word)"
+                   . " VALUES ('$user', '$word')");
+  }
+
+ /**
+   * Queries the expert table by the user's name
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The list of keywords that the user is an expert of,
+   * or null if the user doesn't exist in this list.
+   */ 
+  public function queryExpertsByUser($user) {
+    $result = $this->query("SELECT word FROM Expert WHERE user='$user'");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_all();
+  }
+    
+    
+  /**
+   * Queries the expert table by the topic (keyword)
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The user that is the expert of that area,
+   * or null if the keyword doesn't exist in this list.
+   */   
+  public function queryExpertsByKeyword($word) {
+    $result = $this->query("SELECT user FROM Expert WHERE word='$word'");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_row();
+  }
+
+
+  /**
+   * Deletes an expert from the expert table
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: true, or false if an error occurs.
+   */
+  public function deleteExpert($user, $word) {
+    return $this->query("DELETE FROM Expert WHERE user='$user' AND word='$word'");
   }
 
   /**
@@ -604,6 +670,15 @@ class Database {
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
 
+    // Create the Expert table.
+    $this->query("CREATE TABLE Expert ("
+                 . "user VARCHAR(25) NOT NULL, "
+                 . "word VARCHAR(25) NOT NULL, "
+                 . "PRIMARY KEY (user, word), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user), "
+                 . "FOREIGN KEY (word) REFERENCES Keywords(word)"
+                 . ")");
+
     // Create the views table.
     $this->query("CREATE TABLE Views ("
                  . "user VARCHAR(25), "
@@ -615,13 +690,7 @@ class Database {
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
 
-    $this->query("CREATE TABLE Expert ("
-                 . "user VARCHAR(25) NOT NULL, "
-                 . "word VARCHAR(25) NOT NULL, "
-                 . "PRIMARY KEY (user, word), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (word) REFERENCES Keywords(word)"
-                 . ")");
+    
   }
 
   /**
