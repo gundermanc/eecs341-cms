@@ -191,6 +191,20 @@ class Database {
   }
 
   /**
+   * Looks up a user by his or her username and fetches the associated meta-data.
+   * In a real system we would never return the password hashes like this, but
+   * I'm lazy.
+   * Returns: A User row from the users table as an array.
+   */
+  public function queryUser($user) {
+    $user = $this->connection->escape_string($user);
+
+    $result = $this->query("SELECT * FROM Users U WHERE U.user='$user'");
+
+    return $result->fetch_row();
+  }
+
+  /**
    * Authenticates a user by comparing his/her username and password to the
    * stored password hashes. This function should be used at login.
    * Returns: True if the user name and password match, false if they don't,
@@ -490,6 +504,20 @@ class Database {
     }
 
     $this->query("UPDATE Changes SET approved=$approved WHERE id=$changeId");
+  }
+
+  /**
+   * Calculates the average page rating. Default to 3 stars if no rating.
+   */
+  public function queryPageRating($pageId) {
+    $pageId = $this->connection->escape_string($pageId);
+    $rating = $this->query("SELECT AVG(rating) FROM Pages P, Views V WHERE id=$pageId "
+                           . "AND P.id=V.page_id")-> fetch_row()[0];
+
+    if ($rating == null) {
+      $rating = 3;
+    }
+    return intval($rating);
   }
 
   /**

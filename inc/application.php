@@ -84,6 +84,12 @@ class Application {
    return $this->database->queryPages($title,$author);
   }
 
+  /**
+   * Gets an array containing the user's user data.
+   */
+  public function queryUserMetadata($uname) {
+    return $this->database->queryUser($uname);
+  }
 }
 
 ?>

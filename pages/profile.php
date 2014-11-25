@@ -38,6 +38,7 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 <p>
   <span style="color:#FF0000;"> <?php echo $message ?> </span>
 </p>
+
 <h4>Pages</h4>
 <table>
 <?php
