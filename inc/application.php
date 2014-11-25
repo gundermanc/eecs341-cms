@@ -42,6 +42,14 @@ class Application {
   }
 
   /**
+   * Wrapper function that checks if a user exists.
+   * Returns True if the user exists and false if not.
+   */
+  public function userExists($uname) {
+    return $this->database->userExists($uname);
+  }
+
+  /**
    * Adds user to the database, logs them in, and redirects them to the homepage.
    */
   public function registerUser($uname, $pass){

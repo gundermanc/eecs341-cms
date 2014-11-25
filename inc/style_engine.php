@@ -26,4 +26,8 @@ function makeSearchResult($pid, $title, $user, $created_date){
   return "<tr><td><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a></td><td>By <a href='profile.php?u=$user'>$user</a></td><td> on $created_date</div></td></tr>";
 }
 
+function makeProfilePageEntry($pid, $title, $created_date){
+  return "<tr><td><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a></td><td> Created $created_date</div></td></tr>";
+}
+
 ?>

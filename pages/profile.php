@@ -9,17 +9,46 @@ redirectIfNotLoggedIn();
 // Get an application context.
 $app = new Application();
 
+$uname = "";
+$message = "";
+$pages = null;
+
+if (isset($_GET['u'])) {
+  $uname = $_GET['u'];
+} else {
+  $uname = getUserName();
+}
+
+try {
+  if ($app->userExists($uname)) {
+    $pages = $app->getSearchResults(null, $uname, null);
+  } else {
+    $message = "Requested user $uname does not exist.";
+  }
+} catch (Exception $e) {
+  $message = $e->getMessage();
+}
+
 // Insert the page HTML header with chosen title.
 StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 
 /* Begin page content: */ ?>
 
-<h2>Profile of <?=getUserName()?></h2>
-<h4>My Pages</h4>
+<h2>Profile of <?=$uname?></h2>
+<p>
+  <span style="color:#FF0000;"> <?php echo $message ?> </span>
+</p>
+<h4>Pages</h4>
 <table>
-  <tr>
-    <td><a href="write_page.php">Create page</a></td>
-  </tr>
+<?php
+if($pages != null) {
+  echo "<table>";
+  foreach($pages as $row){
+    echo makeProfilePageEntry($row[0], $row[1], $row[3]);
+  }
+  echo "</table>";
+}
+?>
 </table>
 
 

@@ -35,6 +35,9 @@
                 <td style="padding-left:25px;">
                   <a href="<?=Config::APP_ROOT?>/pages/search.php">Search</a>
                 </td>
+                <td>
+                  <a href="write_page.php">Create Page</a>
+                </td>
               </tr>
             </table>
           </td>
