@@ -4,7 +4,7 @@ require_once '../inc/application.php';
 require_once '../inc/style_engine.php';
 
 session_start();
-redirectIfLoggedOut();
+redirectIfNotLoggedIn();
 
 $title="";
 $author="";
@@ -46,10 +46,6 @@ if(isset($_GET['title'])){
     </style>
   </head>
   <body>
-<?php 
-  echo getLoginInfo();
-  echo getThingsToDo();
-?>
   <form action="search.php" method="get">
       Search by title: <input type=text name=title maxlength=20 value="<?php echo $title ?>"></input>
       <!-- advanced search -->

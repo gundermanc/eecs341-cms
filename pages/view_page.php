@@ -27,10 +27,6 @@ if(isset($_GET['pid'])){
 ?>
 <html>
   <body>
-<?php 
-  echo getLoginInfo();
-  echo getThingsToDo();
-?>
 </br>
 <a href="edit_page.php?pid=<?= $pid?>">Edit this page</a></br></br>
 Title:<div name="title" type="text"><?= $title?></div></br>
