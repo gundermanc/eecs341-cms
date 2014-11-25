@@ -330,7 +330,7 @@ class Database {
 
     $title = $this->connection->escape_string($title);
     $user = $this->connection->escape_string($user);
-    $queryStr = "SELECT (id, title, user, created_date) "
+    $queryStr = "SELECT id, title, user, created_date "
       . "FROM Pages WHERE title LIKE '$title' AND user LIKE '$user'";
 
     $result = $this->query($queryStr);

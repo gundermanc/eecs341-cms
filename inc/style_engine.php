@@ -22,6 +22,8 @@ class StyleEngine {
  }
 }
 
-
+function makeSearchResult($pid, $title, $user, $created_date){
+  return "<div><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a>By <a href='profile.php?u=$user'>$user</a> on $created_date</div>";
+}
 
 ?>
