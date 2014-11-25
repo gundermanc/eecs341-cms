@@ -46,16 +46,3 @@ StyleEngine::insertHeader($app, "Page Title");
 StyleEngine::insertFooter($app);
 
 ?>
-<<<<<<< HEAD
-<html>
-  <body>
-</br>
-<a href="edit_page.php?pid=<?= $pid?>">Edit this page</a></br></br>
-Title:<div name="title" type="text"><?= $title?></div></br>
-Text:<div name="text" type='textArea' id='input'><?= $text ?></div></br>
-  </form>
-  <?php echo $message ?>
- </body>
-</html>
-=======
->>>>>>> 2a647bd... Styled search pages and view page.

@@ -32,6 +32,9 @@
                 <td style="padding-left:25px;">
                   <a href="<?=Config::APP_ROOT?>/pages/register.php">Register</a>
                 </td>
+                <td style="padding-left:25px;">
+                  <a href="<?=Config::APP_ROOT?>/pages/search.php">Search</a>
+                </td>
               </tr>
             </table>
           </td>
