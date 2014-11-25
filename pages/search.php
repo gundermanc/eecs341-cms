@@ -3,7 +3,7 @@ require_once '../inc/util.php';
 require_once '../inc/application.php';
 require_once '../inc/style_engine.php';
 
-session_start();.
+session_start();
 
 $title="";
 $author="";
