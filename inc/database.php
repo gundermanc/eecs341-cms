@@ -257,6 +257,7 @@ class Database {
                                   ."WHERE K.word='$word' AND K.page_id=P.id AND P.user!='$user'");
     if ($possibleExperts!=null){
       $maxRating=-1;
+      $newExpert=null;
       while ($row=mysqli_fetch_row($possibleExperts)){
         $newUser=$row[0];
         $rating=$this->query("SELECT AVG(rating) " 
@@ -269,7 +270,12 @@ class Database {
           $newExpert=$row[0];
         }
       }
-      $this->query("UPDATE Expert SET user='$newExpert' WHERE word='$word'");
+      if($newExpert!=null){
+        $this->query("UPDATE Expert SET user='$newExpert' WHERE word='$word'");
+      }  
+      else{
+        $this->deleteExpert($user, $word);
+      }
     }
   }
 
@@ -753,7 +759,7 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE"
                  . ")");
 
     // Create the changes table.
@@ -782,8 +788,8 @@ class Database {
                  . "user VARCHAR(25) NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (word), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user), "
-                 . "FOREIGN KEY (word) REFERENCES Keywords(word)"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
+                 . "FOREIGN KEY (word) REFERENCES Keywords(word) ON DELETE CASCADE"
                  . ")");
 
     // Create the views table.
