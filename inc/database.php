@@ -232,6 +232,10 @@ class Database {
     return ($this->connection->affected_rows > 0);
   }
 
+  /**
+    * Checks to see if user that is being deleted is an 
+    * expert in any fields. If so, finds a new expert.
+    */
   private function checkIfExpert($user){
     $result=$this->query("SELECT * FROM Expert WHERE user='$user'");
 
@@ -242,6 +246,11 @@ class Database {
     }
   }
 
+  /**
+    * Given the user that is being deleted and the keyword,
+    * finds another user with the next highest average rating
+    * in that field.
+    */
   private function findNewExpert($user, $word){
     $possibleExperts=$this->query("SELECT user "
                                   ."FROM Keywords K, Pages P "
@@ -264,7 +273,10 @@ class Database {
     }
   }
 
-
+  /**
+    * Checks if user that is being deleted is the author of any pages.
+    * If so, updates author of the page to the expert in that field.
+    */
   private function checkIfAuthor($user){
     $result=$this->query("SELECT id FROM Pages WHERE user='$user'");
     if ($result!=null){
@@ -657,6 +669,11 @@ class Database {
     }
   }
 
+  /**
+    * Checks if author of page that was just rated now has a higher 
+    * rating than the expert on the topic of the paper. If author's 
+    * average rating is now higher, author becomes new expert.
+    */
   private function checkRating($page_id){
     $keyword=$this->queryKeywordsByPageId($page_id);
     $keyword=$keyword[0][1];
