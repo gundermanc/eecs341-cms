@@ -224,8 +224,8 @@ class Database {
   public function deleteUser($user) {
     $user = $this->connection->escape_string($user);
 
-    $this->checkIfExpert($user);
-    $this->checkIfAuthor($user);
+    $this->ifExpertUpdateExpertTable($user);
+    $this->ifAuthorUpdatePagesTable($user);
 
     $this->query("DELETE FROM Users WHERE user='$user'");
 
@@ -236,7 +236,7 @@ class Database {
     * Checks to see if user that is being deleted is an 
     * expert in any fields. If so, finds a new expert.
     */
-  private function checkIfExpert($user){
+  private function ifExpertUpdateExpertTable($user){
     $result=$this->query("SELECT * FROM Expert WHERE user='$user'");
 
     if($result!=null){
@@ -283,7 +283,7 @@ class Database {
     * Checks if user that is being deleted is the author of any pages.
     * If so, updates author of the page to the expert in that field.
     */
-  private function checkIfAuthor($user){
+  private function ifAuthorUpdatePagesTable($user){
     $result=$this->query("SELECT id FROM Pages WHERE user='$user'");
     if ($result!=null){
       while ($row=mysqli_fetch_row($result)){
