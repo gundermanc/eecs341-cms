@@ -249,13 +249,14 @@ class Database {
     if ($possibleExperts!=null){
       $maxRating=-1;
       while ($row=mysqli_fetch_row($possibleExperts)){
+        $newUser=$row[0];
         $rating=$this->query("SELECT AVG(rating) " 
           . "FROM Pages P, Keywords K, Views V "
-          . "WHERE P.user='$row[0]' AND P.id=K.page_id AND K.word='$word' AND P.id=V.page_id");
+          . "WHERE P.user='$newUser' AND P.id=K.page_id AND K.word='$word' AND P.id=V.page_id");
         $rating=$rating->fetch_row();
 
         if($rating[0]>$maxRating){
-          $maxRating=$rating;
+          $maxRating=$rating[0];
           $newExpert=$row[0];
         }
       }
