@@ -26,9 +26,11 @@ if (isset($_GET['cid']) && isset($_GET['pid'])) {
 }
 
 if (isset($_POST['pid'])) {
+    $pid = $_POST['pid'];
+    $cid = $_POST['cid'];
     $context = $app->loadPage($pid);
-    //$context->setChangeApproved($cid,$_POST['approved']);
-    $message="Done.";
+    $context->setChangeApproved($cid,isset($_POST['approve']));
+    $message= "Done.";
 }
 
 // Insert the page HTML header with chosen title.
