@@ -40,7 +40,6 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 </p>
 
 <h4>Pages</h4>
-<table>
 <?php
 if($pages != null) {
   echo "<table>";
@@ -50,7 +49,6 @@ if($pages != null) {
   echo "</table>";
 }
 ?>
-</table>
 
 
 

@@ -30,4 +30,12 @@ function makeProfilePageEntry($pid, $title, $created_date){
   return "<tr><td><a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a></td><td> Created $created_date</div></td></tr>";
 }
 
+function makeCommentEntry($user, $rating, $comment) {
+  if (strlen($comment) > 0) {
+    return "<tr><td><i>$user</i></td><td><div align='center'>$rating</div></td><td>$comment</td></tr>";
+  }
+
+  return "";
+}
+
 ?>

@@ -28,6 +28,8 @@ if(isset($_GET['pid'])){
     if(isset($_GET['rating'])) {
       $rating = $_GET['rating'];
 
+      redirectIfNotLoggedIn();
+
       if($rating > 5 || $rating < 1) {
         $message = "Rating must be between 1 and 5.";
       } else {
@@ -59,7 +61,9 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - " . $title);
   <a href="view_page.php?pid=<?=$pid?>&rating=2">2</a>
   <a href="view_page.php?pid=<?=$pid?>&rating=3">3</a>
   <a href="view_page.php?pid=<?=$pid?>&rating=4">4</a>
-  <a href="view_page.php?pid=<?=$pid?>&rating=5">5</a>}</br></br>
+   <a href="view_page.php?pid=<?=$pid?>&rating=5">5</a>},
+<a href="page_comments.php?pid=<?=$pid?>">Comments</a>
+  </br></br>
 </p>
 
 <div name="text" type='textArea' id='input'><p><?= $text ?></p></div>
