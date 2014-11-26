@@ -233,18 +233,36 @@ class Database {
   }
 
   private function checkIfExpert($user){
-    $result=$this->query("SELECT user FROM Expert WHERE user='$user'");
+    $result=$this->query("SELECT * FROM Expert WHERE user='$user'");
 
     if($result!=null){
       while ($row=mysqli_fetch_row($result)){
-        $this->findNewExpert($row[0]);
+        $this->findNewExpert($row[0], $row[1]);
       }
     }
   }
 
-  private function findNewExpert($user){
+  private function findNewExpert($user, $word){
+    $possibleExperts=$this->query("SELECT user "
+                                  ."FROM Keywords K, Pages P "
+                                  ."WHERE K.word='$word' AND K.page_id=P.id AND P.user!='$user'");
+    if ($possibleExperts!=null){
+      $maxRating=-1;
+      while ($row=mysqli_fetch_row($possibleExperts)){
+        $rating=$this->query("SELECT AVG(rating) " 
+          . "FROM Pages P, Keywords K, Views V "
+          . "WHERE P.user='$row[0]' AND P.id=K.page_id AND K.word='$word' AND P.id=V.page_id");
+        $rating=$rating->fetch_row();
 
+        if($rating[0]>$maxRating){
+          $maxRating=$rating;
+          $newExpert=$row[0];
+        }
+      }
+      $this->query("UPDATE Expert SET user='$newExpert' WHERE word='$word'");
+    }
   }
+
 
   private function checkIfAuthor($user){
     $result=$this->query("SELECT id FROM Pages WHERE user='$user'");
@@ -658,10 +676,12 @@ class Database {
           . "FROM Pages P, Keywords K, Views V "
           . "WHERE P.user='$currExpert' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
         $expertRating=$expertRating->fetch_row();
+        
         $newRating=$this->query("SELECT AVG(rating) " 
           . "FROM Views V, Pages P, Keywords K "
           . "WHERE P.user='$author' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
         $newRating=$newRating->fetch_row();
+        
 
         if($newRating[0]>$expertRating[0]){
           $this->deleteExpert($currExpert, $keyword);
