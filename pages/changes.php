@@ -10,11 +10,13 @@ $app = new Application();
 
 $message = "";
 $pid=null;
+$context=null;
 $pending=null;
 
 if (isset($_GET['pid'])) {
   $pid = $_GET['pid'];
-  $pending = $app->getPendingChanges($pid);
+  $context = $app->loadPage($pid);
+  $pending = $context->pendingChanges(getUserName());
 } else {
     $message = "no page id found";
 }

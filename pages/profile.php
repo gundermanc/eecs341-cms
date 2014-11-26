@@ -33,6 +33,19 @@ try {
 StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 
 /* Begin page content: */ ?>
+<script src="../inc/util.js"></script>
+<script>
+  window.onload = function(){
+    sendRequest("../inc/ajax.php",
+                "f=numPending",
+                function(response){
+                  var json = JSON.parse(response);
+                  for(i in json){
+                    document.getElementById(json[i].id).innerHTML=json[i].num;
+                  }
+                });
+  }
+</script>
 
 <h2>Profile of <?=$uname?></h2>
 <p>

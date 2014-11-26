@@ -27,11 +27,8 @@ function makeSearchResult($pid, $title, $user, $created_date){
 }
 
 function makeProfilePageEntry($pid, $title, $created_date){
-    $context = PageContext::fromDb(new Database, $pid);
-    $numPendingChanges = $context->numPendingChanges(getUserName());
-    $display = "<tr><td>".makePageLink($pid, $title)."</td><td> Created $created_date</div></td><td>".
-               ":<a href='".Config::APP_ROOT ."/pages/changes.php?pid=$pid'> $numPendingChanges pending </a></td></tr>";
-    return $display;
+    return "<tr><td>".makePageLink($pid, $title)."</td><td> Created $created_date</div></td><td>".
+               ": <a href='".Config::APP_ROOT ."/pages/changes.php?pid=$pid'><span id='numPend$pid'>?</span> pending</a></td></tr>";
 }
 
 function makePendingChangeEntry($id, $date, $user, $pid){
