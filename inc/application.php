@@ -86,9 +86,18 @@ class Application {
 
   /**
    *Returns an array of pending changes for the given page
-   *(id, approved, contrib_diff, change_date, user, page_id)
+   *(id, approved, change_date, user)
    */
   public function getPendingChanges($pid){
+    $context = PageContext::fromDb($this->database,$pid);
+    return $context->pendingChanges(getUserName());
+  }
+  
+  /**
+   *Returns an array of info for the given change
+   *(id, approved, contrib_diff, change_date, user, page_id)
+   */
+  public function getChangeInfo($cid){
     $context = PageContext::fromDb($this->database,$pid);
     return $context->pendingChanges(getUserName());
   }

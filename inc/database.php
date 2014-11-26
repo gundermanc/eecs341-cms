@@ -467,6 +467,17 @@ class Database {
 
     return $result->fetch_row()[0];
   }
+  
+  /**
+   * Get change for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: an array of "Changes" arrays of form
+   * (id, approved, contrib_diff, change_date, user, page_id)
+   */
+  public function queryChangeByID($cid){
+    $result = $this->query("select * from Changes where id=$cid");
+    return $result->fetch_row();
+  }
 
   /**
    * Get changes diffs for a page by its pageId.

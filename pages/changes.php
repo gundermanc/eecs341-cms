@@ -11,7 +11,6 @@ $app = new Application();
 $message = "";
 $pid=null;
 $pending=null;
-$context=null;
 
 if (isset($_GET['pid'])) {
   $pid = $_GET['pid'];
@@ -31,7 +30,7 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Review");
 if($pending != null){
     echo "<table>";
     foreach($pending as $row){
-        echo makePendingChangeEntry($row[0], $row[2], $row[3]);
+        echo makePendingChangeEntry($row[0], $row[2], $row[3], $pid);
     }
     echo "</table>";
 }

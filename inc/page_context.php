@@ -96,10 +96,7 @@ class PageContext {
    *(id, approved, change_date, user, page_id)
    */
   public function pendingChanges($user){
-    //only the author can see the changes
-    if($user != $this->owner){
-      throw new Exception("You cannot view pending changes if you are not the owner");
-    }
+    $this->checkIsOwner($user);
     $array = $this->database->queryChangesByPage($this->id,null/*not approved*/);
     return $array;
   }
@@ -108,12 +105,18 @@ class PageContext {
    *Returns the amount of unapproved changes made to this page
    */
   public function numPendingChanges($user){
-    //only the author can see the changes
-    if($user != $this->owner){
-      throw new Exception("You cannot view pending changes if you are not the owner");
-    }
+    $this->checkIsOwner($user);
     $num = $this->database->queryNumChangesByPage($this->id,null/*not approved*/);
     return $num;
+  }
+  
+  /**
+   *Retrieves the change info and the actual diff
+   */
+  public function loadChange($cid, $user){
+    $this->checkIsOwner($user);
+    $array = $this->database->queryChangeByID($cid);
+    return $array;
   }
   
   /**
@@ -162,6 +165,12 @@ class PageContext {
   private function __construct() {
     // uhhh, maybe do something. At the moment everything useful happens in
     // the static construction methods.
+  }
+  
+  private function checkIsOwner($user){
+    if($user != $this->owner){
+      throw new Exception("You cannot view pending changes if you are not the owner");
+    }
   }
 }
 

@@ -34,8 +34,8 @@ function makeProfilePageEntry($pid, $title, $created_date){
     return $display;
 }
 
-function makePendingChangeEntry($id, $date, $user){
-  return "<tr><td>".makeUserLink($user)."</td><td> on $date</td><td><a href='".Config::APP_ROOT."/pages/view_change.php?cid=$id'>review</a></td></tr>";
+function makePendingChangeEntry($id, $date, $user, $pid){
+  return "<tr><td>".makeUserLink($user)."</td><td> on $date</td><td><a href='".Config::APP_ROOT."/pages/view_change.php?cid=$id&pid=$pid'>review</a></td></tr>";
 }
 
 function makeUserLink($user){
