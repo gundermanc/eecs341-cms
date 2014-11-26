@@ -224,9 +224,41 @@ class Database {
   public function deleteUser($user) {
     $user = $this->connection->escape_string($user);
 
+    $this->checkIfExpert($user);
+    $this->checkIfAuthor($user);
+
     $this->query("DELETE FROM Users WHERE user='$user'");
 
     return ($this->connection->affected_rows > 0);
+  }
+
+  private function checkIfExpert($user){
+    $result=$this->query("SELECT user FROM Expert WHERE user='$user'");
+
+    if($result!=null){
+      while ($row=mysqli_fetch_row($result)){
+        $this->findNewExpert($row[0]);
+      }
+    }
+  }
+
+  private function findNewExpert($user){
+
+  }
+
+  private function checkIfAuthor($user){
+    $result=$this->query("SELECT id FROM Pages WHERE user='$user'");
+    if ($result!=null){
+      while ($row=mysqli_fetch_row($result)){
+        $page_id=$row[0];
+        $expert=$this->query("SELECT user "
+          . "FROM Expert E, Keywords K "
+          . "WHERE K.page_id='$page_id' AND K.word=E.word");
+        $expert=$expert->fetch_row();
+        $expert=$expert[0];
+        $this->query("UPDATE Pages SET user='$expert' WHERE id='$page_id'");
+      }
+    }
   }
 
   /**
@@ -726,30 +758,7 @@ class Database {
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
-
-    /*$this->query("CREATE TRIGGER test "
-                  . "BEFORE INSERT ON Pages "
-                  . "FOR EACH ROW SET NEW.title='Hi'");*/
-
-    /*$this->query("CREATE TRIGGER checkRating "
-                  . "BEFORE INSERT ON Views "
-                  . "FOR EACH ROW "
-                  //. "BEGIN "
-                  . "SET NEW.rating = NEW.rating+1"
-                  //. "testTriggerFunction()"
-                  //. "END"
-                  . ")");*/
-
-    
   }
-
-  /*private function  testTriggerFunction($page_id){
-    $keyword=queryKeywordsByPageId($page_Id);
-    $author=$this->query("SELECT user FROM Pages WHERE page_id='$page_id'");
-
-    insertExpert($author, $keyword);
-
-  }*/
 
   /**
    * Performs a SQL query on the current DB instance.
