@@ -21,8 +21,7 @@ if(isset($_POST['pid'])){
   try{
     $pageContext = $app->loadPage($pid);
     // TODO: currently no way to update title.
-    // TODO: currently auto accepts each change. Fix when approvals page is done.
-    $pageContext->submitChange(getUserName(), $text, true);
+    $pageContext->submitChange(getUserName(), $text);
   } catch(Exception $e){
     $message=$e->getMessage();
   }

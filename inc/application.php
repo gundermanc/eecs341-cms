@@ -83,7 +83,6 @@ class Application {
   public function getSearchResults($title, $author, $keywords){
    return $this->database->queryPages($title,$author);
   }
-
 }
 
 ?>

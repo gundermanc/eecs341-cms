@@ -28,14 +28,14 @@
                        echo "<a href=\"$root/pages/login.php\">Login</a>";
                      }
                   ?>
-                </td style="padding-left:25px;">
+                </td>
                 <td style="padding-left:25px;">
                   <a href="<?=Config::APP_ROOT?>/pages/register.php">Register</a>
                 </td>
                 <td style="padding-left:25px;">
                   <a href="<?=Config::APP_ROOT?>/pages/search.php">Search</a>
                 </td>
-                <td>
+                <td style="padding-left:25px;">
                   <a href="write_page.php">Create Page</a>
                 </td>
               </tr>

@@ -429,7 +429,7 @@ class Database {
    * Get changes for a page by its pageId.
    * Throws: DatabaseException if SQL error.
    * Returns: an array of "Changes" arrays of form
-   * (id, approved, contrib_diff, change_date, user, page_id)
+   * (id, approved, change_date, user, page_id)
    */
   public function queryChangesByPage($pageId, $approved) {
     if ($approved == null) {
@@ -440,10 +440,43 @@ class Database {
       $approved = "FALSE";
     }
 
-    $result = $this->query("SELECT * FROM Changes WHERE page_id='$pageId' "
-                           . "AND approved=$approved");
+    /*$result = $this->query("SELECT id,approved,change_date,user FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");*/
+      $result = $this->query("SELECT id,approved,change_date,user FROM Changes WHERE page_id=$pageId AND id not in (select id from Changes where page_id=$pageId and approved=true)");
 
     return $result->fetch_all();
+  }
+  
+  /**
+   * Gets the amount of changes for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: an int
+   */
+  public function queryNumChangesByPage($pageId, $approved) {
+    if ($approved == null) {
+      $approved = "NULL";
+    } else if ($approved == true) {
+      $approved = "TRUE";
+    } else {
+      $approved = "FALSE";
+    }
+
+    /*$result = $this->query("SELECT COUNT(*) as count FROM Changes WHERE page_id='$pageId' "
+                           . "AND approved=$approved");*/
+    $result = $this->query("SELECT Count(*) FROM Changes WHERE page_id=$pageId AND id not in (select id from Changes where page_id=$pageId and approved=true)");
+
+    return $result->fetch_row()[0];
+  }
+  
+  /**
+   * Get change for a page by its pageId.
+   * Throws: DatabaseException if SQL error.
+   * Returns: an array of "Changes" arrays of form
+   * (id, approved, contrib_diff, change_date, user, page_id)
+   */
+  public function queryChangeByID($cid){
+    $result = $this->query("select * from Changes where id=$cid");
+    return $result->fetch_row();
   }
 
   /**
