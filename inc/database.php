@@ -751,7 +751,17 @@ class Database {
     // Create admin user account.
     $this->insertUser(Config::ADMIN_USER, Config::ADMIN_PASS);
 
-    // Create the pages table.
+    /**
+     * Creates the Pages table.
+     * When a user is deleted using the function deleteUser, 
+     * it goes through the function ifAuthorUpdatePagesTable
+     * where the expert of the pages field is found and 
+     * that user then replaces the user that was deleted as the
+     * author of the page. This means that the only time a user
+     * attribute in this table will actually be deleted is when 
+     * there are no other people writing on this topic. Therefore,
+     * the content is not useful and the page is deleted.
+     */
     $this->query("CREATE TABLE Pages ("
                  . "id MEDIUMINT AUTO_INCREMENT, "
                  . "title VARCHAR(255) NOT NULL, "
@@ -783,12 +793,21 @@ class Database {
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  . ")");
 
-    // Create the Expert table.
+    /**
+     * Creates the Expert table.
+     * When a user is deleted using the function deleteUser, 
+     * it goes through the function ifExpertUpdateExpertsTable
+     * where a new expert replaces the deleted expert before the
+     * actual user is deleted. This means that the only time the  
+     * foreign key user will be deleted is when there are no other
+     * users writing on this topic, therefore the field can be
+     * removed from the expert table.
+     */
     $this->query("CREATE TABLE Expert ("
                  . "user VARCHAR(25) NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (word), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "  
                  . "FOREIGN KEY (word) REFERENCES Keywords(word) ON DELETE CASCADE"
                  . ")");
 
