@@ -550,6 +550,41 @@ class Database {
   }
 
   /**
+   * Inserts a page refernce into the Reference table
+   */
+  public function insertReference($page_id, $ref_id){
+    $this->query("INSERT INTO Reference (page_id, ref_id)"
+                   . " VALUES ('$page_id', '$ref_id')");
+  }
+
+  /**
+   * Given a page id, will return all pages that the
+   * page references.
+   */
+  public function queryReferencesByPage($page_id){
+    $result=$this->query("SELECT ref_id FROM Reference WHERE page_id='$page_id'");
+
+    return $result->fetch_all();
+  }
+
+  /**
+   * Given a page id, returns all the pages that references
+   * that page.
+   */
+  public function queryReferencesByReference($ref_id){
+    $result=$this->query("SELECT page_id FROM Reference WHERE ref_id='$ref_id'");
+
+    return $result->fetch_all();
+  }
+
+  /**
+   * Deletes a page refernce from the Reference page
+   */
+  public function deleteReference($page_id, $ref_id){
+    $this->query("DELETE FROM Reference WHERE page_id='$page_id' AND ref_id='$ref_id'");
+  }
+
+  /**
    * Drops the old database and creates the table schemas from scratch.
    */
   private function freshInstall() {
@@ -614,6 +649,15 @@ class Database {
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
                  .")");
+
+    //Creates the references table
+    $this->query("CREATE TABLE Reference ("
+                 . "page_id MEDIUMINT NOT NULL, "
+                 . "ref_id MEDIUMINT NOT NULL, "
+                 . "PRIMARY KEY (page_id, ref_id), "
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
+                 . "FOREIGN KEY (ref_id) REFERENCES Pages(id) ON DELETE CASCADE"
+                 . ")");
   }
 
   /**
