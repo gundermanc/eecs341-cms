@@ -224,9 +224,78 @@ class Database {
   public function deleteUser($user) {
     $user = $this->connection->escape_string($user);
 
+    $this->ifExpertUpdateExpertTable($user);
+    $this->ifAuthorUpdatePagesTable($user);
+
     $this->query("DELETE FROM Users WHERE user='$user'");
 
     return ($this->connection->affected_rows > 0);
+  }
+
+  /**
+    * Checks to see if user that is being deleted is an 
+    * expert in any fields. If so, finds a new expert.
+    */
+  private function ifExpertUpdateExpertTable($user){
+    $result=$this->query("SELECT * FROM Expert WHERE user='$user'");
+
+    if($result!=null){
+      while ($row=mysqli_fetch_row($result)){
+        $this->findNewExpert($row[0], $row[1]);
+      }
+    }
+  }
+
+  /**
+    * Given the user that is being deleted and the keyword,
+    * finds another user with the next highest average rating
+    * in that field.
+    */
+  private function findNewExpert($user, $word){
+    $possibleExperts=$this->query("SELECT user "
+                                  ."FROM Keywords K, Pages P "
+                                  ."WHERE K.word='$word' AND K.page_id=P.id AND P.user!='$user'");
+    if ($possibleExperts!=null){
+      $maxRating=-1;
+      $newExpert=null;
+      while ($row=mysqli_fetch_row($possibleExperts)){
+        $newUser=$row[0];
+        $rating=$this->query("SELECT AVG(rating) " 
+          . "FROM Pages P, Keywords K, Views V "
+          . "WHERE P.user='$newUser' AND P.id=K.page_id AND K.word='$word' AND P.id=V.page_id");
+        $rating=$rating->fetch_row();
+
+        if($rating[0]>$maxRating){
+          $maxRating=$rating[0];
+          $newExpert=$row[0];
+        }
+      }
+      if($newExpert!=null){
+        $this->query("UPDATE Expert SET user='$newExpert' WHERE word='$word'");
+      }  
+      else{
+        $this->deleteExpert($user, $word);
+      }
+    }
+  }
+
+  /**
+    * Checks if user that is being deleted is the author of any pages.
+    * If so, updates author of the page to the expert in that field.
+    */
+  private function ifAuthorUpdatePagesTable($user){
+    $result=$this->query("SELECT id FROM Pages WHERE user='$user'");
+    if ($result!=null){
+      while ($row=mysqli_fetch_row($result)){
+        $page_id=$row[0];
+        $expert=$this->query("SELECT user "
+          . "FROM Expert E, Keywords K "
+          . "WHERE K.page_id='$page_id' AND K.word=E.word");
+        $expert=$expert->fetch_row();
+        $expert=$expert[0];
+        $this->query("UPDATE Pages SET user='$expert' WHERE id='$page_id'");
+      }
+    }
   }
 
   /**
@@ -350,7 +419,12 @@ class Database {
   }
    
     
-    
+ /**
+   * Queries the keyword table by the page's ID
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The specified tuple as an array,
+   * or null if the page doesn't exist.
+   */ 
   public function queryKeywordsByPageId($pageId) {
     $result = $this->query("SELECT * FROM Keywords WHERE page_id='$pageId'");
         
@@ -363,7 +437,12 @@ class Database {
   }
     
     
-    
+  /**
+   * Queries the keyword table by the keyword
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: All pages with the keyword as an array (page_id, keyword),
+   * or null if the keyword doesn't exist.
+   */  
   public function queryKeywordsByWord($word) {
     $result = $this->query("SELECT page_id FROM Keywords WHERE word='$word'");
         
@@ -381,7 +460,65 @@ class Database {
    * Returns: true, or false if an error occurs.
    */
   public function deleteKeyword($page_id, $word) {
-    return $this->query("DELETE FROM Keywords WHERE page_id=$page_id AND word=$word");
+    return $this->query("DELETE FROM Keywords WHERE page_id='$page_id' AND word='$word'");
+  }
+
+  /**
+   * Inserts a new expert into the expert table
+   */
+  public function insertExpert($user, $word) {
+    $user = $this->connection->escape_string($user);
+    $word = $this->connection->escape_string($word);
+      
+    $this->query("INSERT INTO Expert (user, word)"
+                   . " VALUES ('$user', '$word')");
+
+
+  }
+
+ /**
+   * Queries the expert table by the user's name
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The list of keywords that the user is an expert of,
+   * or null if the user doesn't exist in this list.
+   */ 
+  public function queryExpertsByUser($user) {
+    $result = $this->query("SELECT word FROM Expert WHERE user='$user'");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_all();
+  }
+    
+    
+  /**
+   * Queries the expert table by the topic (keyword)
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: The user that is the expert of that area,
+   * or null if the keyword doesn't exist in this list.
+   */   
+  public function queryExpertsByKeyword($word) {
+    $result = $this->query("SELECT user FROM Expert WHERE word='$word'");
+        
+    // No pages with the specified id, return null.
+    if ($result->num_rows == 0) {
+        return null;
+    }
+        
+    return $result->fetch_row();
+  }
+
+
+  /**
+   * Deletes an expert from the expert table
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: true, or false if an error occurs.
+   */
+  public function deleteExpert($user, $word) {
+    return $this->query("DELETE FROM Expert WHERE user='$user' AND word='$word'");
   }
 
   /**
@@ -559,6 +696,7 @@ class Database {
     try {
       $this->query("REPLACE INTO Views (user, page_id $columns) "
                    . "VALUES ('$user', $pageId$values)");
+      $this->checkRating($pageId);
     } catch (DatabaseException $ex) {
 
       // FOREIGN KEY Constraint: Incorrect username or page.
@@ -568,6 +706,47 @@ class Database {
         throw $ex;
       }
     }
+  }
+
+  /**
+    * Checks if author of page that was just rated now has a higher 
+    * rating than the expert on the topic of the paper. If author's 
+    * average rating is now higher, author becomes new expert.
+    */
+  private function checkRating($page_id){
+    $keyword=$this->queryKeywordsByPageId($page_id);
+    $keyword=$keyword[0][1];
+    $result=$this->query("SELECT user FROM Pages WHERE id='$page_id'");
+    $author=$result->fetch_row();
+    $author=$author[0];
+
+    if($this->queryExpertsByKeyword($keyword)==null){
+     $this->insertExpert($author, $keyword);
+    }
+    else{
+      $result=$this->query("SELECT user FROM Expert WHERE word='$keyword'");
+      $currExpert=$result->fetch_row();
+      $currExpert=$currExpert[0];
+      
+      if ($author!=$currExpert){
+        $expertRating=$this->query("SELECT AVG(rating) " 
+          . "FROM Pages P, Keywords K, Views V "
+          . "WHERE P.user='$currExpert' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
+        $expertRating=$expertRating->fetch_row();
+        
+        $newRating=$this->query("SELECT AVG(rating) " 
+          . "FROM Views V, Pages P, Keywords K "
+          . "WHERE P.user='$author' AND P.id=K.page_id AND K.word='$keyword' AND P.id=V.page_id");
+        $newRating=$newRating->fetch_row();
+        
+
+        if($newRating[0]>$expertRating[0]){
+          $this->deleteExpert($currExpert, $keyword);
+          $this->insertExpert($author,$keyword);
+        }
+      }
+    }
+
   }
 
   /**
@@ -605,7 +784,17 @@ class Database {
     // Create admin user account.
     $this->insertUser(Config::ADMIN_USER, Config::ADMIN_PASS);
 
-    // Create the pages table.
+    /**
+     * Creates the Pages table.
+     * When a user is deleted using the function deleteUser, 
+     * it goes through the function ifAuthorUpdatePagesTable
+     * where the expert of the pages field is found and 
+     * that user then replaces the user that was deleted as the
+     * author of the page. This means that the only time a user
+     * attribute in this table will actually be deleted is when 
+     * there are no other people writing on this topic. Therefore,
+     * the content is not useful and the page is deleted.
+     */
     $this->query("CREATE TABLE Pages ("
                  . "id MEDIUMINT AUTO_INCREMENT, "
                  . "title VARCHAR(255) NOT NULL, "
@@ -613,7 +802,7 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE"
                  . ")");
 
     // Create the changes table.
@@ -635,6 +824,24 @@ class Database {
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (page_id, word), "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
+                 . ")");
+
+    /**
+     * Creates the Expert table.
+     * When a user is deleted using the function deleteUser, 
+     * it goes through the function ifExpertUpdateExpertsTable
+     * where a new expert replaces the deleted expert before the
+     * actual user is deleted. This means that the only time the  
+     * foreign key user will be deleted is when there are no other
+     * users writing on this topic, therefore the field can be
+     * removed from the expert table.
+     */
+    $this->query("CREATE TABLE Expert ("
+                 . "user VARCHAR(25) NOT NULL, "
+                 . "word VARCHAR(25) NOT NULL, "
+                 . "PRIMARY KEY (word), "
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "  
+                 . "FOREIGN KEY (word) REFERENCES Keywords(word) ON DELETE CASCADE"
                  . ")");
 
     // Create the views table.
