@@ -13,6 +13,7 @@ $uname = "";
 $message = "";
 $pages = null;
 $views = null;
+$changes = null;
 
 if (isset($_GET['u'])) {
   $uname = $_GET['u'];
@@ -24,6 +25,7 @@ try {
   if ($app->userExists($uname)) {
     $pages = $app->getSearchResults(null, $uname, null);
     $views = $app->queryUsersViews(getUserName());
+    $changes = $app->queryChangesByUser(getUserName());
   } else {
     $message = "Requested user $uname does not exist.";
   }
@@ -57,6 +59,16 @@ if($views != null) {
   echo "<table>";
   foreach($views as $row){
     echo makeProfileViewEntry($row[0], $row[1], $row[3], $row[4]);
+  }
+  echo "</table>";
+}
+?>
+<h4>Recent Posted Edits</h4>
+<?php
+if($changes != null) {
+  echo "<table>";
+  foreach($changes as $row){
+    echo makeProfileChangeEntry($row[0], $row[1], $row[2], $row[3]);
   }
   echo "</table>";
 }

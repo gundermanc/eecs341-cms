@@ -9,7 +9,6 @@ $message = "";
 $title="";
 $text="";
 $pid="";
-$views = null;
 $rating = 0;
 $owner = "";
 
@@ -22,7 +21,6 @@ if(isset($_GET['pid'])){
     $pageContext = $app->loadPage($pid);
     $title = $pageContext->getTitle();
     $text = $pageContext->queryContent();
-    $views = $pageContext->getViews();
     $owner = $pageContext->getOwner();
 
     if(isset($_GET['rating'])) {

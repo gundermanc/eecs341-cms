@@ -47,4 +47,18 @@ function makeProfileViewEntry($pid, $title, $rating, $comment) {
   return "";
 }
 
+function makeProfileChangeEntry($pid, $title, $approved, $date) {
+  if ($approved == null) {
+    $approved = "Pending";
+  } else if ($approved) {
+    $approved = "Approved";
+  } else {
+    $approved = "Denied";
+  }
+
+  return "<tr><td><a href='view_page.php?pid=$pid'>$title</a></td>"
+    . "<td><div align='center'><i>$approved</i></div></td>"
+    . "<td>on $date</td></tr>";
+}
+
 ?>

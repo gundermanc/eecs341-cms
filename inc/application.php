@@ -97,6 +97,10 @@ class Application {
   public function queryUsersViews($uname) {
     return $this->database->queryUsersViews($uname);
   }
+
+  public function queryChangesByUser($uname) {
+    return $this->database->queryChangesByUser($uname);
+  }
 }
 
 ?>

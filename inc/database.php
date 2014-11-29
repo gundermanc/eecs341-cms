@@ -461,6 +461,18 @@ class Database {
   }
 
   /**
+   * Queries a user's changes sorted from most recent to less recent.
+   */
+  public function queryChangesByUser($user) {
+    $result = $this->query("SELECT C.page_id, P.title, C.approved, C.change_date "
+			   . "FROM Changes C, Pages P "
+			   . "WHERE C.page_id=P.id AND C.user='$user' "
+			   . "ORDER BY C.change_date DESC");
+
+    return $result->fetch_all();
+  }
+
+  /**
    * Get changes diffs for a page by its pageId.
    * Throws: DatabaseException if SQL error.
    * Returns: a numeric array of diff strings.
