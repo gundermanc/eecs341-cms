@@ -90,6 +90,13 @@ class Application {
   public function queryUserMetadata($uname) {
     return $this->database->queryUser($uname);
   }
+
+  /**
+   * Gets a list of the pages viewed most recently by the user.
+   */
+  public function queryUsersViews($uname) {
+    return $this->database->queryUsersViews($uname);
+  }
 }
 
 ?>

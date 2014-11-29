@@ -38,4 +38,13 @@ function makeCommentEntry($user, $rating, $comment) {
   return "";
 }
 
+function makeProfileViewEntry($pid, $title, $rating, $comment) {
+  if (strlen($comment) > 0) {
+    return "<tr><td><a href='view_page.php?pid=$pid'>$title</a></td>"
+      . "<td><div align='center'>Rated: $rating</div></td><td>Commented: <i>$comment</i></td></tr>";
+  }
+
+  return "";
+}
+
 ?>

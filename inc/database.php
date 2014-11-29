@@ -531,6 +531,7 @@ class Database {
 
     $columns = "";
     $values = "";
+    $date = self::timeStamp();
 
     if ($rating != null) {
       if ($rating < 0 || $rating > Database::RATING_MAX) {
@@ -552,8 +553,8 @@ class Database {
     }
 
     try {
-      $this->query("REPLACE INTO Views (user, page_id $columns) "
-                   . "VALUES ('$user', $pageId$values)");
+      $this->query("REPLACE INTO Views (user, page_id $columns, viewed_date) "
+                   . "VALUES ('$user', $pageId$values, '$date')");
     } catch (DatabaseException $ex) {
 
       // FOREIGN KEY Constraint: Incorrect username or page.
@@ -569,10 +570,24 @@ class Database {
    * Queries DB for all views of the requested page.
    * Throws: DatabaseException if a SQL error occurs.
    * Returns: an array of "View" arrays. View array is formed as:
-   * (user, page_id, rating, comment).
+   * (page_id, title, user, rating, comment).
    */
   public function queryViews($pageId) {
     $result = $this->query("SELECT * FROM Views WHERE page_id=$pageId");
+
+    return $result->fetch_all();
+  }
+
+  /**
+   * Queries DB for most recent views by specified user.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: an array of "View" arrays. View array is formed as:
+   * (user, page_id, rating, comment, viewed_date).
+   */
+  public function queryUsersViews($user) {
+    $result = $this->query("SELECT V.page_id, P.title, P.user, V.rating, V.comment FROM "
+                           . "Views V, Pages P WHERE V.page_id=P.id AND V.user='$user' "
+                           . "ORDER BY viewed_date DESC");
 
     return $result->fetch_all();
   }
@@ -638,6 +653,7 @@ class Database {
                  . "page_id MEDIUMINT, "
                  . "rating TINYINT NOT NULL, "
                  . "comment VARCHAR(255), "
+                 . "viewed_date DATETIME NOT NULL, "
                  . "PRIMARY KEY (user, page_id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"

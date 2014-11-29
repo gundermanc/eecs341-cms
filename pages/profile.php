@@ -12,6 +12,7 @@ $app = new Application();
 $uname = "";
 $message = "";
 $pages = null;
+$views = null;
 
 if (isset($_GET['u'])) {
   $uname = $_GET['u'];
@@ -22,6 +23,7 @@ if (isset($_GET['u'])) {
 try {
   if ($app->userExists($uname)) {
     $pages = $app->getSearchResults(null, $uname, null);
+    $views = $app->queryUsersViews(getUserName());
   } else {
     $message = "Requested user $uname does not exist.";
   }
@@ -39,7 +41,7 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
   <span style="color:#FF0000;"> <?php echo $message ?> </span>
 </p>
 
-<h4>Pages</h4>
+<h4>Owned Pages</h4>
 <?php
 if($pages != null) {
   echo "<table>";
@@ -49,8 +51,16 @@ if($pages != null) {
   echo "</table>";
 }
 ?>
-
-
+<h4>Recently Viewed Pages</h4>
+<?php
+if($views != null) {
+  echo "<table>";
+  foreach($views as $row){
+    echo makeProfileViewEntry($row[0], $row[1], $row[3], $row[4]);
+  }
+  echo "</table>";
+}
+?>
 
 <?php /* End page content. */
 // Insert the page HTML footer.
