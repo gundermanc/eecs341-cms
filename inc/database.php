@@ -853,7 +853,7 @@ class Database {
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
-                 . "INDEX USING HASH (page_id, change_date)"
+                 . "INDEX USING BTREE (page_id, change_date)"
                  . ")");
       
     // Create the keywords table.
