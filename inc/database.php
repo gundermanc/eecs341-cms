@@ -823,7 +823,8 @@ class Database {
                  . "user VARCHAR(25), "
                  . "pass VARCHAR(64) NOT NULL, "
                  . "join_date DATETIME NOT NULL, "
-                 . "PRIMARY KEY(user) "
+                 . "PRIMARY KEY(user), "
+                 . "INDEX USING HASH (user)"
                  . ")");
 
     // Create admin user account.
@@ -847,7 +848,8 @@ class Database {
                  . "created_date DATETIME NOT NULL, "
                  . "cached_data MEDIUMTEXT NOT NULL, "
                  . "PRIMARY KEY (id), "
-                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE"
+                 . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
+                 . "INDEX USING HASH (id)"
                  . ")");
 
     // Create the changes table.
@@ -860,7 +862,8 @@ class Database {
                  . "page_id MEDIUMINT NOT NULL, "
                  . "PRIMARY KEY (id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE SET NULL, "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
+                 . "INDEX USING BTREE (page_id, change_date)"
                  . ")");
       
     // Create the keywords table.
@@ -868,7 +871,8 @@ class Database {
                  . "page_id MEDIUMINT NOT NULL, "
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (page_id, word), "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
+                 . "INDEX USING HASH (word)"
                  . ")");
 
     /**
@@ -886,7 +890,8 @@ class Database {
                  . "word VARCHAR(25) NOT NULL, "
                  . "PRIMARY KEY (word), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "  
-                 . "FOREIGN KEY (word) REFERENCES Keywords(word) ON DELETE CASCADE"
+                 . "FOREIGN KEY (word) REFERENCES Keywords(word) ON DELETE CASCADE, "
+                 . "INDEX USING HASH (word)"
                  . ")");
 
     // Create the views table.
@@ -897,8 +902,9 @@ class Database {
                  . "comment VARCHAR(255), "
                  . "PRIMARY KEY (user, page_id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
-                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE"
-                 .")");
+                 . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
+                 . "INDEX USING HASH (page_id)"
+                 . ")");
 
     //Creates the references table
     $this->query("CREATE TABLE Reference ("
@@ -906,7 +912,8 @@ class Database {
                  . "ref_id MEDIUMINT NOT NULL, "
                  . "PRIMARY KEY (page_id, ref_id), "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
-                 . "FOREIGN KEY (ref_id) REFERENCES Pages(id) ON DELETE CASCADE"
+                 . "FOREIGN KEY (ref_id) REFERENCES Pages(id) ON DELETE CASCADE, "
+                 . "INDEX USING HASH (page_id)"
                  . ")");
   }
 
