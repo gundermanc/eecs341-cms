@@ -8,14 +8,17 @@ redirectIfNotLoggedIn();
 
 $title="";
 $message="";
+$keywords="";
 
 // Get an application context.
 $app = new Application();
 
 if(isset($_POST['title'])){
   $title = $_POST['title'];
+  $keywords = $_POST['keywords'];
   try{
     $pageContext = $app->newPage($title, getUserName());
+    $pageContext->addKeywords(explode(",", $keywords));
     redirectToEdit($pageContext->getId());
   } catch(Exception $e){
     $message = $e->getMessage();
@@ -37,8 +40,12 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - New Page");
         Title:
       </td>
       <td>
-        <input type="text" name="title" maxlength="250" value="<?php echo $title ?>"></input>
+        <input type="text" name="title" maxlength="250" value="<?php echo $title ?>"/>
       </td>
+    </tr>
+    <tr>
+      <td>Keywords:</td>
+      <td><input type="text" name="keywords" maxlength="250" value="<?php echo $keywords ?>"></td>
     </tr>
   </table>
   <br />
