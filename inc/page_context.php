@@ -16,19 +16,22 @@ class PageContext {
   private $id;
   private $content = null;
   private $views = null;
+  private $keyword;
 
   /**
    * Creates a new page and returns a page context for it.
    */
-  public static function fromNewPage($database, $title, $owner) {
+  public static function fromNewPage($database, $title, $owner, $keyword) {
     $pageContext = new self();
 
     $pageContext->database = $database;
     $pageContext->title = $title;
     $pageContext->owner = $owner;
+    $pageContext->keyword = $keyword;
 
     $pageContext->id = $pageContext->database->insertPage($pageContext->title,
                                                           $pageContext->owner);
+    $pageContext->database->insertKeyword($pageContext->id, $pageContext->keyword);
 
     return $pageContext;
   }
@@ -97,6 +100,13 @@ class PageContext {
    */
   public function getViews() {
     return $this->views;
+  }
+
+  /**
+   * Gets an array of Page View arrays.
+   */
+  public function getKeyword() {
+    return $this->keyword;
   }
 
   /**

@@ -11,6 +11,7 @@ $text="";
 $pid="";
 $rating = 0;
 $owner = "";
+$keyword = "";
 
 // Get an application context.
 $app = new Application();
@@ -22,6 +23,7 @@ if(isset($_GET['pid'])){
     $title = $pageContext->getTitle();
     $text = $pageContext->queryContent();
     $owner = $pageContext->getOwner();
+    #$keyword = $pageContext->getKeyword();
 
     if(isset($_GET['rating'])) {
       $rating = $_GET['rating'];
@@ -52,6 +54,10 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - " . $title);
 </p>
 
 <p>
+
+
+<p>
+  <i>Keywords: </i><?= $keyword ?></br>
   <i>Owned By: <a href="profile.php?u=<?=$owner?>"><?= $owner ?></a></i>,
   <a href="edit_page.php?pid=<?= $pid?>">Edit this page</a>,
   {Rating{<?=$rating?>}
@@ -59,8 +65,8 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - " . $title);
   <a href="view_page.php?pid=<?=$pid?>&rating=2">2</a>
   <a href="view_page.php?pid=<?=$pid?>&rating=3">3</a>
   <a href="view_page.php?pid=<?=$pid?>&rating=4">4</a>
-   <a href="view_page.php?pid=<?=$pid?>&rating=5">5</a>},
-<a href="page_comments.php?pid=<?=$pid?>">Comments</a>
+  <a href="view_page.php?pid=<?=$pid?>&rating=5">5</a>},
+  <a href="page_comments.php?pid=<?=$pid?>">Comments</a>
   </br></br>
 </p>
 
