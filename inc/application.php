@@ -34,7 +34,7 @@ class Application {
   public function logIn($uname, $pass){
     if($this->database->authenticateUser($uname,$pass)){
       setLoginTrue($uname);
-      redirectToIndex();
+      redirectToProfile();
       return true;
     } else{
       return false;
