@@ -64,9 +64,9 @@ class Application {
   /**
    * Saves a new page in the database
    */
-  public function newPage($name, $user) {
+  public function newPage($name, $user, $keyword) {
     if (isLoggedIn()) {
-      return PageContext::fromNewPage($this->database, $name, $user);
+      return PageContext::fromNewPage($this->database, $name, $user, $keyword);
     }
   }
 
