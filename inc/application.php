@@ -90,6 +90,24 @@ class Application {
   public function queryPopularPages() {
     return $this->database->queryPopularPages();
   }
+
+  /*
+   * Gets an array containing the user's user data.
+   */
+  public function queryUserMetadata($uname) {
+    return $this->database->queryUser($uname);
+  }
+
+  /**
+   * Gets a list of the pages viewed most recently by the user.
+   */
+  public function queryUsersViews($uname) {
+    return $this->database->queryUsersViews($uname);
+  }
+
+  public function queryChangesByUser($uname) {
+    return $this->database->queryChangesByUser($uname);
+  }
 }
 
 ?>

@@ -12,6 +12,8 @@ $app = new Application();
 $uname = "";
 $message = "";
 $pages = null;
+$views = null;
+$changes = null;
 
 if (isset($_GET['u'])) {
   $uname = $_GET['u'];
@@ -22,6 +24,8 @@ if (isset($_GET['u'])) {
 try {
   if ($app->userExists($uname)) {
     $pages = $app->getSearchResults(null, $uname, null);
+    $views = $app->queryUsersViews(getUserName());
+    $changes = $app->queryChangesByUser(getUserName());
   } else {
     $message = "Requested user $uname does not exist.";
   }
@@ -51,8 +55,8 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - Profile");
 <p>
   <span style="color:#FF0000;"> <?php echo $message ?> </span>
 </p>
-<h4>Pages</h4>
-<table>
+
+<h4>Owned Pages</h4>
 <?php
 if($pages != null) {
   echo "<table>";
@@ -62,9 +66,26 @@ if($pages != null) {
   echo "</table>";
 }
 ?>
-</table>
-
-
+<h4>Recently Viewed Pages</h4>
+<?php
+if($views != null) {
+  echo "<table>";
+  foreach($views as $row){
+    echo makeProfileViewEntry($row[0], $row[1], $row[3], $row[4]);
+  }
+  echo "</table>";
+}
+?>
+<h4>Recent Posted Edits</h4>
+<?php
+if($changes != null) {
+  echo "<table>";
+  foreach($changes as $row){
+    echo makeProfileChangeEntry($row[0], $row[1], $row[2], $row[3]);
+  }
+  echo "</table>";
+}
+?>
 
 <?php /* End page content. */
 // Insert the page HTML footer.

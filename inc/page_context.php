@@ -15,6 +15,7 @@ class PageContext {
   private $owner;
   private $id;
   private $content = null;
+  private $views = null;
 
   /**
    * Creates a new page and returns a page context for it.
@@ -44,12 +45,30 @@ class PageContext {
     // See queryPageById in database.php for schema info.
     $record = $pageContext->database->queryPageById($pageContext->id);
 
+    // Query list of views, ratings, comments.
+    $pageContext->views = $pageContext->database->queryViews($pageContext->id);
+
     // Save record to the class fields.
     $pageContext->title = $record[1];
     $pageContext->owner = $record[2];
     $pageContext->id = $record[0];
 
     return $pageContext;
+  }
+
+  /**
+   * Adds or updates a View record comment and rating for a page.
+   * If rating or comment is null, it will not be changed.
+   */
+  public function replaceView($user, $rating, $comment) {
+    $this->database->replaceView($user, $this->id, $rating, $comment);
+  }
+
+  /**
+   * Gets the average page rating for this page.
+   */
+  public function queryRating() {
+    return $this->database->queryPageRating($this->id);
   }
 
   /**
@@ -71,6 +90,13 @@ class PageContext {
    */
   public function getId() {
     return $this->id;
+  }
+
+  /**
+   * Gets an array of Page View arrays.
+   */
+  public function getViews() {
+    return $this->views;
   }
 
   /**

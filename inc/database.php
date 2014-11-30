@@ -191,6 +191,20 @@ class Database {
   }
 
   /**
+   * Looks up a user by his or her username and fetches the associated meta-data.
+   * In a real system we would never return the password hashes like this, but
+   * I'm lazy.
+   * Returns: A User row from the users table as an array.
+   */
+  public function queryUser($user) {
+    $user = $this->connection->escape_string($user);
+
+    $result = $this->query("SELECT * FROM Users U WHERE U.user='$user'");
+
+    return $result->fetch_row();
+  }
+
+  /**
    * Authenticates a user by comparing his/her username and password to the
    * stored password hashes. This function should be used at login.
    * Returns: True if the user name and password match, false if they don't,
@@ -627,6 +641,18 @@ class Database {
   }
 
   /**
+   * Queries a user's changes sorted from most recent to less recent.
+   */
+  public function queryChangesByUser($user) {
+    $result = $this->query("SELECT C.page_id, P.title, C.approved, C.change_date "
+			   . "FROM Changes C, Pages P "
+			   . "WHERE C.page_id=P.id AND C.user='$user' "
+			   . "ORDER BY C.change_date DESC");
+
+    return $result->fetch_all();
+  }
+
+  /**
    * Get changes diffs for a page by its pageId.
    * Throws: DatabaseException if SQL error.
    * Returns: a numeric array of diff strings.
@@ -673,6 +699,20 @@ class Database {
   }
 
   /**
+   * Calculates the average page rating. Default to 3 stars if no rating.
+   */
+  public function queryPageRating($pageId) {
+    $pageId = $this->connection->escape_string($pageId);
+    $rating = $this->query("SELECT AVG(rating) FROM Pages P, Views V WHERE id=$pageId "
+                           . "AND P.id=V.page_id")-> fetch_row()[0];
+
+    if ($rating == null) {
+      $rating = 3;
+    }
+    return intval($rating);
+  }
+
+  /**
    * Creates or updates a view record with the new comment and or rating.
    * Either comment or rating may be null if you don't want to change it.
    * Throws: DatabaseException if a SQL error occurs, or if an invalid
@@ -683,6 +723,7 @@ class Database {
 
     $columns = "";
     $values = "";
+    $date = self::timeStamp();
 
     if ($rating != null) {
       if ($rating < 0 || $rating > Database::RATING_MAX) {
@@ -704,8 +745,8 @@ class Database {
     }
 
     try {
-      $this->query("REPLACE INTO Views (user, page_id $columns) "
-                   . "VALUES ('$user', $pageId$values)");
+      $this->query("REPLACE INTO Views (user, page_id $columns, viewed_date) "
+                   . "VALUES ('$user', $pageId$values, '$date')");
       $this->checkRating($pageId);
     } catch (DatabaseException $ex) {
 
@@ -763,7 +804,7 @@ class Database {
    * Queries DB for all views of the requested page.
    * Throws: DatabaseException if a SQL error occurs.
    * Returns: an array of "View" arrays. View array is formed as:
-   * (user, page_id, rating, comment).
+   * (page_id, title, user, rating, comment).
    */
   public function queryViews($pageId) {
     $result = $this->query("SELECT * FROM Views WHERE page_id=$pageId");
@@ -795,6 +836,18 @@ class Database {
    */
   public function queryReferencesByReference($ref_id){
     $result=$this->query("SELECT page_id FROM Reference WHERE ref_id='$ref_id'");
+  }
+
+  /*
+   * Queries DB for most recent views by specified user.
+   * Throws: DatabaseException if a SQL error occurs.
+   * Returns: an array of "View" arrays. View array is formed as:
+   * (user, page_id, rating, comment, viewed_date).
+   */
+  public function queryUsersViews($user) {
+    $result = $this->query("SELECT V.page_id, P.title, P.user, V.rating, V.comment FROM "
+                           . "Views V, Pages P WHERE V.page_id=P.id AND V.user='$user' "
+                           . "ORDER BY viewed_date DESC");
 
     return $result->fetch_all();
   }
@@ -900,6 +953,7 @@ class Database {
                  . "page_id MEDIUMINT, "
                  . "rating TINYINT NOT NULL, "
                  . "comment VARCHAR(255), "
+                 . "viewed_date DATETIME NOT NULL, "
                  . "PRIMARY KEY (user, page_id), "
                  . "FOREIGN KEY (user) REFERENCES Users(user) ON DELETE CASCADE, "
                  . "FOREIGN KEY (page_id) REFERENCES Pages(id) ON DELETE CASCADE, "
