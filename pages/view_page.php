@@ -11,6 +11,7 @@ $text="";
 $pid="";
 $rating = 0;
 $owner = "";
+$keywords = null;
 
 // Get an application context.
 $app = new Application();
@@ -22,6 +23,7 @@ if(isset($_GET['pid'])){
     $title = $pageContext->getTitle();
     $text = $pageContext->queryContent();
     $owner = $pageContext->getOwner();
+    $keywords = $pageContext->queryKeywords();
 
     if(isset($_GET['rating'])) {
       $rating = $_GET['rating'];
@@ -61,7 +63,15 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - " . $title);
   <a href="view_page.php?pid=<?=$pid?>&rating=4">4</a>
    <a href="view_page.php?pid=<?=$pid?>&rating=5">5</a>},
 <a href="page_comments.php?pid=<?=$pid?>">Comments</a>
-  </br></br>
+  </br>
+<?php
+if (($keywords != null) && (count($keywords) > 0)) {
+  echo "<i>Pertaining to: </i>";
+  foreach ($keywords as $keyword) {
+    echo "<a href='search.php?title=&author=&keywords=$keyword'>$keyword</a>" . ", ";
+  }
+}
+?>
 </p>
 
 <div name="text" type='textArea' id='input'><p><?= $text ?></p></div>

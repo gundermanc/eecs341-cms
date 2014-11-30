@@ -16,6 +16,7 @@ class PageContext {
   private $id;
   private $content = null;
   private $views = null;
+  private $keywords = null;
 
   /**
    * Creates a new page and returns a page context for it.
@@ -100,6 +101,29 @@ class PageContext {
   }
 
   /**
+   * Add page keyword, first trying best to strip out whitespace.
+   * Returns: nothing.
+   */
+  public function addKeyword($keyword) {
+    $keyword = trim($keyword, " \t\n\r\0\x0B,");
+    $keyword = strtolower($keyword);
+
+    if (strlen($keyword) != 0) {
+      $this->database->insertKeyword($this->id, $keyword);
+    }
+  }
+
+  /**
+   * Adds an array of keywords to this page.
+   * Returns: nothing.
+   */
+  public function addKeywords($keywords) {
+    foreach ($keywords as $keyword) {
+      $this->addKeyword($keyword);
+    }
+  }
+
+  /**
    * Submits a new pending change and returns the ID integer.
    */
   public function submitChange($user, $newContent, $approved = null) {
@@ -168,6 +192,26 @@ class PageContext {
     }
 
     return $this->content;
+  }
+
+  /**
+   * Queries keywords associated with this page and returns them as an
+   * array of strings.
+   */
+  public function queryKeywords() {
+    $keywordsArrays = $this->database->queryKeywordsByPageId($this->id);
+    $keywordStrArray = array();
+
+    if ($keywordsArrays == null) {
+      return null;
+    }
+
+    // Convert array of records to an array of keyword strings.
+    foreach ($keywordsArrays as $keyword) {
+      $keywordStrArray[] = $keyword[1];
+    }
+
+    return $keywordStrArray;
   }
 
   /**
