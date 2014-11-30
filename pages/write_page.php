@@ -7,7 +7,6 @@ session_start();
 redirectIfNotLoggedIn();
 
 $title="";
-$keyword="";
 $message="";
 $keywords="";
 

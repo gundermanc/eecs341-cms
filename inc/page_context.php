@@ -21,17 +21,15 @@ class PageContext {
   /**
    * Creates a new page and returns a page context for it.
    */
-  public static function fromNewPage($database, $title, $owner, $keyword) {
+  public static function fromNewPage($database, $title, $owner) {
     $pageContext = new self();
 
     $pageContext->database = $database;
     $pageContext->title = $title;
     $pageContext->owner = $owner;
-    $pageContext->keyword = $keyword;
 
     $pageContext->id = $pageContext->database->insertPage($pageContext->title,
                                                           $pageContext->owner);
-    $pageContext->database->insertKeyword($pageContext->id, $pageContext->keyword);
 
     return $pageContext;
   }

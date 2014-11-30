@@ -55,7 +55,6 @@ StyleEngine::insertHeader($app, Config::APP_NAME . " - " . $title);
 
 <p>
 
-
 <p>
   <i>Owned By: <a href="profile.php?u=<?=$owner?>"><?= $owner ?></a></i>,
   <a href="edit_page.php?pid=<?= $pid?>">Edit this page</a>,
