@@ -8,7 +8,7 @@ function redirectIfNotLoggedIn(){
 
 function redirectIfLoggedIn(){
   if(isLoggedIn()){
-    redirectToProfile();
+    redirectToIndex();
   }
 }
 
