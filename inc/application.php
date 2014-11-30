@@ -83,6 +83,13 @@ class Application {
   public function getSearchResults($title, $author, $keywords){
    return $this->database->queryPages($title,$author);
   }
+
+  /**
+   * Gets pages ranked by popularity.
+   */
+  public function queryPopularPages() {
+    return $this->database->queryPopularPages();
+  }
 }
 
 ?>

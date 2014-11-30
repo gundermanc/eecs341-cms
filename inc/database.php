@@ -417,7 +417,17 @@ class Database {
     $this->query("INSERT INTO Keywords (page_id, word)"
                    . " VALUES ('$page_id', '$word')");
   }
-   
+
+  /**
+   * Gets a list of the most popular pages by change activity.
+   */
+  public function queryPopularPages() {
+    $result = $this->query("SELECT P.id, P.title, P.created_date "
+		 . "FROM Pages P ORDER BY (SELECT COUNT(*) "
+		 . "FROM Changes C WHERE C.page_id=P.id) DESC");
+
+    return $result->fetch_all();
+  }
     
  /**
    * Queries the keyword table by the page's ID

@@ -30,10 +30,10 @@
                   ?>
                 </td>
                 <td style="padding-left:25px;">
-                  <a href="<?=Config::APP_ROOT?>/pages/register.php">Register</a>
+                  <a href="<?=Config::APP_ROOT?>/pages/search.php">Search</a>
                 </td>
                 <td style="padding-left:25px;">
-                  <a href="<?=Config::APP_ROOT?>/pages/search.php">Search</a>
+                  <a href="profile.php">Profile</a>
                 </td>
                 <td style="padding-left:25px;">
                   <a href="write_page.php">Create Page</a>

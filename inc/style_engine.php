@@ -43,4 +43,8 @@ function makePageLink($pid, $title){
     return "<a href='" . Config::APP_ROOT . "/pages/view_page.php?pid=$pid'>$title</a>";
 }
 
+function makeNewsfeedPageEntry($pid, $title, $created_date){
+    return "<tr><td>".makePageLink($pid, $title)."</td><td> Created $created_date</div></td><td></td></tr>";
+}
+
 ?>
