@@ -24,8 +24,8 @@ if (isset($_GET['u'])) {
 try {
   if ($app->userExists($uname)) {
     $pages = $app->getSearchResults(null, $uname, null);
-    $views = $app->queryUsersViews(getUserName());
-    $changes = $app->queryChangesByUser(getUserName());
+    $views = $app->queryUsersViews($uname);
+    $changes = $app->queryChangesByUser($uname);
   } else {
     $message = "Requested user $uname does not exist.";
   }
