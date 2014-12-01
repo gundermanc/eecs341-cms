@@ -106,7 +106,7 @@ class ReplaceViewDatabaseException extends DatabaseException {
 class Database {
   const USER_MAX = 20;
   const TITLE_MAX = 250;
-  const DIFF_MAX = 990;
+  const DIFF_MAX = 16000000;
   const RATING_MAX = 5;
   const COMMENT_MAX = 250;
 
@@ -387,6 +387,7 @@ class Database {
    * an error.
    */
   public function updatePageCachedData($pageId, $data) {
+    $data = $this->connection->escape_string($data);
     return $this->query("UPDATE Pages SET cached_data='$data' WHERE id=$pageId");
   }
 
@@ -557,7 +558,7 @@ class Database {
     $date = Database::timeStamp();
 
     if (strlen($contribDiff) > Database::DIFF_MAX) {
-      throw new DiffTooLongException(Database::DIFF_MAX);
+      throw new DiffTooLongDatabaseException(Database::DIFF_MAX);
     }
 
     if ($approved == null) {
@@ -909,7 +910,7 @@ class Database {
     $this->query("CREATE TABLE Changes ("
                  . "id MEDIUMINT AUTO_INCREMENT, "
                  . "approved BOOLEAN, "
-                 . "contrib_diff VARCHAR(1000) NOT NULL, "
+                 . "contrib_diff MEDIUMTEXT NOT NULL, "
                  . "change_date DATETIME NOT NULL, "
                  . "user VARCHAR(25) , "
                  . "page_id MEDIUMINT NOT NULL, "

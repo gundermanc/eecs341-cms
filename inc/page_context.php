@@ -1,6 +1,7 @@
 <?php
 
 require_once('config.php');
+require_once('exception.php');
 require_once('database.php');
 require_once('delta_encoder.php');
 
@@ -239,7 +240,7 @@ class PageContext {
   
   private function checkIsOwner($user){
     if($user != $this->owner){
-      throw new Exception("You cannot view pending changes if you are not the owner");
+      throw new AppException("You cannot view pending changes if you are not the owner");
     }
   }
 }

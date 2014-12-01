@@ -13,12 +13,16 @@ $pid=null;
 $context=null;
 $pending=null;
 
-if (isset($_GET['pid'])) {
-  $pid = $_GET['pid'];
-  $context = $app->loadPage($pid);
-  $pending = $context->pendingChanges(getUserName());
-} else {
+try {
+  if (isset($_GET['pid'])) {
+    $pid = $_GET['pid'];
+    $context = $app->loadPage($pid);
+    $pending = $context->pendingChanges(getUserName());
+  } else {
     $message = "no page id found";
+  }
+} catch (Exception $ex) {
+  $message = $ex->getMessage();
 }
 
 // Insert the page HTML header with chosen title.
